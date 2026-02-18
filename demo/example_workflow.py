@@ -3,7 +3,6 @@
 End-to-end пример: планирование исследования биоэквивалентности омепразола.
 """
 
-import json
 import sys
 import os
 

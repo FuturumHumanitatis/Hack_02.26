@@ -30,7 +30,7 @@ def _z(alpha: float) -> float:
     p = 1.0 - alpha
     # Rational approximation (Abramowitz & Stegun 26.2.23)
     if p <= 0.0 or p >= 1.0:
-        return 0.0
+        raise ValueError(f"Probability must be in (0, 1), got {p}")
     if p < 0.5:
         sign = -1.0
         pp = p
