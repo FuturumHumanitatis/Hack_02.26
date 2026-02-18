@@ -70,11 +70,11 @@ def _format_study_info(
 Режим приёма: {study_input.regime}
 
 Фармакокинетические параметры:
-- Cmax: {pk.cmax if pk.cmax else 'не указан'} нг/мл
-- AUC: {pk.auc if pk.auc else 'не указан'} нг·ч/мл
-- Tmax: {pk.tmax if pk.tmax else 'не указан'} ч
-- T½: {pk.t_half if pk.t_half else 'не указан'} ч
-- CVintra: {pk.cv_intra if pk.cv_intra else 'не указан'}
+- Cmax: {pk.cmax if pk.cmax is not None else 'не указан'} нг/мл
+- AUC: {pk.auc if pk.auc is not None else 'не указан'} нг·ч/мл
+- Tmax: {pk.tmax if pk.tmax is not None else 'не указан'} ч
+- T½: {pk.t_half if pk.t_half is not None else 'не указан'} ч
+- CVintra: {pk.cv_intra if pk.cv_intra is not None else 'не указан'}
 
 Дизайн исследования:
 - Тип: {design.name} ({design.type})

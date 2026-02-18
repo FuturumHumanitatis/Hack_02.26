@@ -15,6 +15,7 @@ from design.logic import select_study_design
 from stats.sample_size import calculate_sample_size
 from reg.checks import run_regulatory_checks
 from llm.client import generate_llm_synopsis
+from config import LLM_MODEL
 
 
 def main() -> None:
@@ -74,7 +75,7 @@ def main() -> None:
         synopsis = generate_llm_synopsis(
             study, pk, design, sample, issues,
             api_key=api_key,
-            model="gpt-4"
+            model=LLM_MODEL
         )
         
         print("✅  Синопсис успешно сгенерирован через LLM!")
