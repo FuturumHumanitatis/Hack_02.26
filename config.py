@@ -35,3 +35,8 @@ DESIGN_ADJUSTMENT = {
     "parallel": 1.3,
     "other": 1.0,
 }
+
+# LLM настройки
+LLM_ENABLED = True  # Включить/выключить использование LLM для генерации синопсиса
+LLM_MODEL = "gpt-4"  # Модель OpenAI для использования
+LLM_FALLBACK_TO_TEMPLATE = True  # Использовать шаблонную генерацию при ошибке LLM
