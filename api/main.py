@@ -1,11 +1,14 @@
 """
 FastAPI-приложение — единственный POST-эндпоинт /design,
 который принимает параметры исследования и возвращает полный результат.
+Также обслуживает UI-форму для ввода данных на корневом маршруте (/).
 """
 
+import pathlib
 from typing import List
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from design.logic import select_study_design
@@ -21,11 +24,20 @@ from reg.checks import run_regulatory_checks
 from stats.sample_size import calculate_sample_size
 from synopsis.generator import generate_synopsis_markdown
 
+_STATIC_DIR = pathlib.Path(__file__).resolve().parent.parent / "static"
+
 app = FastAPI(
     title="Ifarma BE Study Planner",
     description="Прототип AI-инструмента для планирования исследований биоэквивалентности",
     version="0.1.0",
 )
+
+
+@app.get("/", response_class=HTMLResponse)
+def ui_form() -> HTMLResponse:
+    """Отдаёт HTML-форму для ввода параметров исследования."""
+    html_path = _STATIC_DIR / "index.html"
+    return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
 
 
 class DesignResponse(BaseModel):

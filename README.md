@@ -22,6 +22,7 @@ reg/checks.py          — регуляторные проверки
 synopsis/templates.py  — текстовые шаблоны (русский язык)
 synopsis/generator.py  — генерация Markdown-синопсиса
 api/main.py            — FastAPI-приложение
+static/index.html      — UI-форма ввода параметров исследования
 demo/example_workflow.py — демонстрация end-to-end сценария
 ```
 
@@ -35,6 +36,7 @@ python demo/example_workflow.py
 
 # Запустить API-сервер
 uvicorn api.main:app --reload
+# Открыть UI-форму в браузере: http://localhost:8000/
 ```
 
 ## Пример запроса к API

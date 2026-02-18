@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ifarma BE Study Planner</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --success: #0d904f;
+            --warning: #e8a317;
+            --error: #d93025;
+            --info: #1a73e8;
+            --input-bg: #f8f9fa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 24px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        header h1 { font-size: 1.6rem; font-weight: 600; }
+        header p { opacity: 0.85; font-size: 0.95rem; margin-top: 4px; }
+        .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+        /* ── Form Card ── */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        label .hint {
+            font-weight: 400;
+            font-size: 0.78rem;
+            color: #888;
+        }
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: var(--input-bg);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--text);
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+        }
+        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            padding-top: 20px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px; height: 18px; accent-color: var(--primary);
+        }
+        .checkbox-group label { margin-bottom: 0; font-size: 0.92rem; }
+
+        /* ── Button ── */
+        .btn-row { text-align: center; margin-top: 12px; }
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 36px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-submit:hover { background: var(--primary-dark); }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* ── Spinner ── */
+        .spinner {
+            display: none;
+            width: 22px; height: 22px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Results ── */
+        #results { display: none; }
+        .result-section { margin-bottom: 16px; }
+        .result-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        table.pk-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        table.pk-table th, table.pk-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        table.pk-table th {
+            background: var(--input-bg);
+            font-weight: 600;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .tag-info { background: #e8f0fe; color: var(--info); }
+        .tag-warning { background: #fef3cd; color: #856404; }
+        .tag-error { background: #fce8e6; color: var(--error); }
+        .issue-item {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            border-left: 4px solid var(--border);
+            background: var(--input-bg);
+            font-size: 0.9rem;
+        }
+        .issue-item.info { border-left-color: var(--info); }
+        .issue-item.warning { border-left-color: var(--warning); }
+        .issue-item.error { border-left-color: var(--error); }
+        .synopsis-box {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .error-box {
+            background: #fce8e6;
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            padding: 14px 18px;
+            color: var(--error);
+            font-size: 0.92rem;
+        }
+        .no-issues {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .card { padding: 18px 16px; }
+            header { padding: 18px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>💊 Ifarma BE Study Planner</h1>
+    <p>Планирование исследований биоэквивалентности — ввод параметров</p>
+</header>
+
+<div class="container">
+
+    <!-- ═══════════ FORM ═══════════ -->
+    <form id="studyForm" novalidate>
+
+        <!-- Drug Information -->
+        <div class="card">
+            <h2>🧪 Информация о препарате</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="inn">МНН (INN) действующего вещества <span class="hint">*</span></label>
+                    <input type="text" id="inn" name="inn" required
+                           placeholder="напр. омепразол" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="dose_mg">Дозировка, мг <span class="hint">*</span></label>
+                    <input type="number" id="dose_mg" name="dose_mg" required
+                           min="0.01" step="any" placeholder="напр. 20">
+                </div>
+                <div class="form-group">
+                    <label for="form">Лекарственная форма</label>
+                    <select id="form" name="form">
+                        <option value="tablet">Таблетка</option>
+                        <option value="capsule">Капсула</option>
+                        <option value="solution">Раствор</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regime">Режим приёма</label>
+                    <select id="regime" name="regime">
+                        <option value="fasted">Натощак</option>
+                        <option value="fed">После еды</option>
+                        <option value="both">Оба</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Variability / Design -->
+        <div class="card">
+            <h2>📊 Вариабельность и дизайн</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cv_intra">CVintra <span class="hint">(0–1, необязательно)</span></label>
+                    <input type="number" id="cv_intra" name="cv_intra"
+                           min="0" max="1" step="0.01" placeholder="напр. 0.25">
+                </div>
+                <div class="form-group">
+                    <label for="cv_category">Категория CVintra <span class="hint">(если число не задано)</span></label>
+                    <select id="cv_category" name="cv_category">
+                        <option value="">— не выбрано —</option>
+                        <option value="low">Низкая (low)</option>
+                        <option value="high">Высокая (high)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="study_type">Тип исследования</label>
+                    <select id="study_type" name="study_type">
+                        <option value="single">Однофазное</option>
+                        <option value="two_stage">Двухфазное (адаптивное)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="preferred_design">Предпочтительный дизайн <span class="hint">(необязательно)</span></label>
+                    <input type="text" id="preferred_design" name="preferred_design"
+                           placeholder="напр. 2x2">
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="need_rsabe" name="need_rsabe">
+                    <label for="need_rsabe">Необходимость применения RSABE</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Population -->
+        <div class="card">
+            <h2>👥 Параметры популяции добровольцев</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="min_age">Минимальный возраст <span class="hint">(≥ 18)</span></label>
+                    <input type="number" id="min_age" name="min_age"
+                           value="18" min="18" max="65">
+                </div>
+                <div class="form-group">
+                    <label for="max_age">Максимальный возраст <span class="hint">(≤ 65)</span></label>
+                    <input type="number" id="max_age" name="max_age"
+                           value="55" min="18" max="65">
+                </div>
+                <div class="form-group">
+                    <label for="sex">Пол добровольцев</label>
+                    <select id="sex" name="sex">
+                        <option value="both">Мужской и женский</option>
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+                <div class="form-group" style="visibility:hidden">
+                    <!-- spacer for grid alignment -->
+                </div>
+                <div class="form-group">
+                    <label for="bmi_min">Минимальный ИМТ</label>
+                    <input type="number" id="bmi_min" name="bmi_min"
+                           value="18.5" min="10" max="50" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="bmi_max">Максимальный ИМТ</label>
+                    <input type="number" id="bmi_max" name="bmi_max"
+                           value="30.0" min="10" max="60" step="0.1">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span id="btnText">Рассчитать план исследования</span>
+                <span class="spinner" id="spinner"></span>
+            </button>
+        </div>
+    </form>
+
+    <!-- ═══════════ RESULTS ═══════════ -->
+    <div id="results">
+
+        <!-- Error -->
+        <div id="errorBox" class="error-box" style="display:none;margin-bottom:20px;"></div>
+
+        <!-- PK Parameters -->
+        <div class="card result-section" id="resPK">
+            <h2>📈 Фармакокинетические параметры</h2>
+            <table class="pk-table">
+                <thead>
+                    <tr><th>Параметр</th><th>Значение</th></tr>
+                </thead>
+                <tbody id="pkBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Design -->
+        <div class="card result-section" id="resDesign">
+            <h2>🔬 Выбранный дизайн исследования</h2>
+            <div id="designDetails"></div>
+        </div>
+
+        <!-- Sample Size -->
+        <div class="card result-section" id="resSample">
+            <h2>🔢 Размер выборки</h2>
+            <div id="sampleDetails"></div>
+        </div>
+
+        <!-- Regulatory Issues -->
+        <div class="card result-section" id="resIssues">
+            <h2>⚠️ Регуляторные замечания</h2>
+            <div id="issuesList"></div>
+        </div>
+
+        <!-- Synopsis -->
+        <div class="card result-section" id="resSynopsis">
+            <h2>📝 Синопсис протокола</h2>
+            <div class="synopsis-box" id="synopsisContent"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.getElementById('studyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const resultsDiv = document.getElementById('results');
+    const errorBox = document.getElementById('errorBox');
+
+    // Build payload
+    const payload = {
+        inn: document.getElementById('inn').value.trim(),
+        dose_mg: parseFloat(document.getElementById('dose_mg').value),
+        form: document.getElementById('form').value,
+        regime: document.getElementById('regime').value,
+        study_type: document.getElementById('study_type').value,
+        min_age: parseInt(document.getElementById('min_age').value, 10),
+        max_age: parseInt(document.getElementById('max_age').value, 10),
+        sex: document.getElementById('sex').value,
+        bmi_min: parseFloat(document.getElementById('bmi_min').value),
+        bmi_max: parseFloat(document.getElementById('bmi_max').value),
+    };
+
+    // Optional fields
+    const cvVal = document.getElementById('cv_intra').value;
+    if (cvVal !== '') payload.cv_intra = parseFloat(cvVal);
+
+    const cvCat = document.getElementById('cv_category').value;
+    if (cvCat !== '') payload.cv_category = cvCat;
+
+    const prefDesign = document.getElementById('preferred_design').value.trim();
+    if (prefDesign !== '') payload.preferred_design = prefDesign;
+
+    if (document.getElementById('need_rsabe').checked) {
+        payload.need_rsabe = true;
+    }
+
+    // Validate required
+    if (!payload.inn || isNaN(payload.dose_mg) || payload.dose_mg <= 0) {
+        errorBox.textContent = 'Пожалуйста, заполните обязательные поля: МНН и дозировка (> 0).';
+        errorBox.style.display = 'block';
+        resultsDiv.style.display = 'block';
+        document.getElementById('resPK').style.display = 'none';
+        document.getElementById('resDesign').style.display = 'none';
+        document.getElementById('resSample').style.display = 'none';
+        document.getElementById('resIssues').style.display = 'none';
+        document.getElementById('resSynopsis').style.display = 'none';
+        return;
+    }
+
+    // Show spinner
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    btnText.textContent = 'Расчёт…';
+    errorBox.style.display = 'none';
+
+    try {
+        const resp = await fetch('/design', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.detail || `Ошибка сервера: ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        renderResults(data);
+
+    } catch (err) {
+        errorBox.textContent = 'Ошибка: ' + err.message;
+        errorBox.style.display = 'block';
+        resultsDiv.style.display = 'block';
+        document.getElementById('resPK').style.display = 'none';
+        document.getElementById('resDesign').style.display = 'none';
+        document.getElementById('resSample').style.display = 'none';
+        document.getElementById('resIssues').style.display = 'none';
+        document.getElementById('resSynopsis').style.display = 'none';
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Рассчитать план исследования';
+    }
+});
+
+function renderResults(data) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.style.display = 'block';
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('resPK').style.display = '';
+    document.getElementById('resDesign').style.display = '';
+    document.getElementById('resSample').style.display = '';
+    document.getElementById('resIssues').style.display = '';
+    document.getElementById('resSynopsis').style.display = '';
+
+    // PK table
+    const pk = data.pk;
+    const pkRows = [
+        ['Cmax (нг/мл)', pk.cmax],
+        ['AUC (нг·ч/мл)', pk.auc],
+        ['Tmax (ч)', pk.tmax],
+        ['T½ (ч)', pk.t_half],
+        ['CVintra', pk.cv_intra],
+    ];
+    document.getElementById('pkBody').innerHTML = pkRows.map(([p, v]) =>
+        `<tr><td>${p}</td><td>${v != null ? v : '—'}</td></tr>`
+    ).join('');
+
+    // Design
+    const d = data.design;
+    document.getElementById('designDetails').innerHTML = `
+        <table class="pk-table">
+            <tr><th>Название</th><td>${d.name}</td></tr>
+            <tr><th>Тип</th><td>${d.type}</td></tr>
+            <tr><th>Периоды</th><td>${d.periods}</td></tr>
+            <tr><th>Последовательности</th><td>${d.sequences.join(', ')}</td></tr>
+            <tr><th>Wash-out (дни)</th><td>${d.washout_days}</td></tr>
+            <tr><th>RSABE</th><td>${d.rsabe_applicable ? 'Да' : 'Нет'}</td></tr>
+        </table>
+    `;
+
+    // Sample size
+    const s = data.sample_size;
+    document.getElementById('sampleDetails').innerHTML = `
+        <table class="pk-table">
+            <tr><th>Базовый N</th><td>${s.base_n}</td></tr>
+            <tr><th>N с учётом потерь</th><td>${s.adjusted_for_dropout}</td></tr>
+            <tr><th>Drop-out rate</th><td>${(s.dropout_rate * 100).toFixed(0)}%</td></tr>
+            <tr><th>Screen-fail rate</th><td>${(s.screen_fail_rate * 100).toFixed(0)}%</td></tr>
+        </table>
+    `;
+
+    // Issues
+    const issuesDiv = document.getElementById('issuesList');
+    if (data.issues.length === 0) {
+        issuesDiv.innerHTML = '<p class="no-issues">✅ Замечаний нет.</p>';
+    } else {
+        issuesDiv.innerHTML = data.issues.map(iss => {
+            const tagClass = 'tag-' + iss.severity;
+            return `<div class="issue-item ${iss.severity}">
+                <span class="tag ${tagClass}">${iss.severity.toUpperCase()}</span>
+                <strong>[${iss.code}]</strong> ${iss.message}
+            </div>`;
+        }).join('');
+    }
+
+    // Synopsis
+    document.getElementById('synopsisContent').textContent = data.synopsis_md;
+
+    // Scroll to results
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
+</body>
+</html>
