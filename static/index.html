@@ -6,88 +6,153 @@
     <title>Ifarma BE Study Planner</title>
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --text: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
-            --success: #0d904f;
-            --warning: #e8a317;
-            --error: #d93025;
-            --info: #1a73e8;
-            --input-bg: #f8f9fa;
+            --primary: #ff7a18;
+            --primary-dark: #a445b2;
+            --accent: #ff3cac;
+            --bg: #0f0b1f;
+            --card-bg: rgba(24, 18, 45, 0.82);
+            --text: #f7ecff;
+            --text-secondary: #ccb9e3;
+            --border: #4d3b66;
+            --success: #35d07f;
+            --warning: #ffb84d;
+            --error: #ff7a88;
+            --info: #b191ff;
+            --input-bg: rgba(18, 13, 36, 0.86);
+            --btn-grad-1: #8e2de2;
+            --btn-grad-2: #ff512f;
+            --btn-grad-3: #dd2476;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg);
+            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(120deg, #140a27, #1f0f35, #2a143a, #140a27);
+            background-size: 300% 300%;
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.55;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before, body::after {
+            content: "";
+            position: fixed;
+            z-index: -1;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        body::before {
+            background: #ff5f6d;
+            top: -80px;
+            left: -120px;
+        }
+        body::after {
+            background: #7f5dff;
+            right: -90px;
+            bottom: -120px;
         }
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(130deg, #2d163d 0%, var(--primary-dark) 42%, var(--primary) 100%);
             color: #fff;
-            padding: 24px 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(7, 3, 17, 0.6);
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
         }
-        header h1 { font-size: 1.6rem; font-weight: 600; }
-        header p { opacity: 0.85; font-size: 0.95rem; margin-top: 4px; }
-        .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-
-        /* ── Form Card ── */
+        header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.2px; }
+        header p { opacity: 0.9; font-size: 1rem; margin-top: 8px; max-width: 760px; }
+        .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 36px; position: relative; z-index: 1; }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+            list-style: none;
+            padding-left: 0;
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: #f2d8ff;
+            font-size: 0.84rem;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+        .step-current {
+            background: linear-gradient(120deg, rgba(255,122,24,0.22), rgba(164,69,178,0.2));
+            border-color: rgba(255, 122, 24, 0.4);
+            box-shadow: 0 0 0 1px rgba(255, 122, 24, 0.28), 0 0 20px rgba(255, 60, 172, 0.25);
+        }
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            padding: 28px 32px;
-            margin-bottom: 24px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            box-shadow: 0 14px 34px rgba(8, 4, 20, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 26px 28px;
+            margin-bottom: 18px;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 42px rgba(8, 4, 20, 0.62);
         }
         .card h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #ffdcb3;
+            margin-bottom: 6px;
+        }
+        .section-lead {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 18px;
         }
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px 24px;
+            gap: 14px 18px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
+        .form-group { display: flex; flex-direction: column; }
         label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
         }
         label .hint {
-            font-weight: 400;
-            font-size: 0.78rem;
-            color: #888;
+            font-weight: 500;
+            font-size: 0.75rem;
+            color: var(--text);
+            text-transform: none;
+            letter-spacing: 0;
         }
         input, select {
-            padding: 10px 12px;
+            padding: 12px 13px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.95rem;
             background: var(--input-bg);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.16s;
             color: var(--text);
         }
+        input::placeholder { color: var(--text); opacity: 0.62; }
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+            box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.32), 0 0 18px rgba(255, 60, 172, 0.24);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            transform: translateY(-1px);
         }
         input[type="number"] { -moz-appearance: textfield; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -96,121 +161,165 @@
         .checkbox-group {
             flex-direction: row;
             align-items: center;
-            gap: 8px;
-            padding-top: 20px;
+            gap: 10px;
+            padding-top: 24px;
         }
         .checkbox-group input[type="checkbox"] {
             width: 18px; height: 18px; accent-color: var(--primary);
         }
-        .checkbox-group label { margin-bottom: 0; font-size: 0.92rem; }
-
-        /* ── Button ── */
-        .btn-row { text-align: center; margin-top: 12px; }
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            color: var(--text);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .btn-row { text-align: center; margin-top: 2px; }
         .btn-submit {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: var(--primary);
+            gap: 10px;
+            background: linear-gradient(120deg, var(--btn-grad-1), var(--btn-grad-2), var(--btn-grad-3));
+            background-size: 220% 220%;
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 12px 36px;
+            border-radius: 12px;
+            padding: 13px 38px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 14px 26px rgba(103, 43, 123, 0.44);
+            transition: transform 0.14s, box-shadow 0.2s, filter 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-submit:hover { background: var(--primary-dark); }
-        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit::after {
+            content: "";
+            position: absolute;
+            top: -150%;
+            left: -35%;
+            width: 30%;
+            height: 400%;
+            background: rgba(255, 255, 255, 0.24);
+            transform: rotate(25deg);
+            pointer-events: none;
+        }
+        .btn-submit:hover { transform: translateY(-1px); filter: brightness(1.06); }
+        .btn-submit:active { transform: scale(0.99); }
         .btn-submit:disabled {
-            background: #aaa;
+            background: linear-gradient(120deg, #665979, #827297);
+            box-shadow: none;
             cursor: not-allowed;
         }
-
-        /* ── Spinner ── */
         .spinner {
             display: none;
-            width: 22px; height: 22px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255,255,255,0.32);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Results ── */
-        #results { display: none; }
-        .result-section { margin-bottom: 16px; }
-        .result-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
+        #results { display: none; margin-top: 20px; }
+        .result-section { margin-bottom: 14px; }
         table.pk-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
         }
         table.pk-table th, table.pk-table td {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border);
             text-align: left;
         }
         table.pk-table th {
-            background: var(--input-bg);
+            background: rgba(255, 255, 255, 0.06);
             font-weight: 600;
         }
         .tag {
             display: inline-block;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-right: 4px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            margin-right: 6px;
         }
-        .tag-info { background: #e8f0fe; color: var(--info); }
-        .tag-warning { background: #fef3cd; color: #856404; }
-        .tag-error { background: #fce8e6; color: var(--error); }
+        .tag-info { background: rgba(177, 145, 255, 0.2); color: #ceb5ff; }
+        .tag-warning { background: rgba(255, 184, 77, 0.18); color: #ffd39a; }
+        .tag-error { background: rgba(255, 122, 136, 0.18); color: #ffb5bd; }
         .issue-item {
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 7px;
+            border-radius: 8px;
             border-left: 4px solid var(--border);
-            background: var(--input-bg);
+            background: rgba(255, 255, 255, 0.04);
             font-size: 0.9rem;
         }
         .issue-item.info { border-left-color: var(--info); }
         .issue-item.warning { border-left-color: var(--warning); }
         .issue-item.error { border-left-color: var(--error); }
         .synopsis-box {
-            background: var(--input-bg);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 10px;
+            padding: 16px 18px;
             font-size: 0.88rem;
-            line-height: 1.7;
+            line-height: 1.65;
             white-space: pre-wrap;
             max-height: 600px;
             overflow-y: auto;
         }
         .error-box {
-            background: #fce8e6;
+            background: rgba(255, 122, 136, 0.15);
             border: 1px solid var(--error);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 14px 18px;
             color: var(--error);
             font-size: 0.92rem;
         }
-        .no-issues {
-            color: var(--success);
-            font-weight: 500;
+        .no-issues { color: var(--success); font-weight: 600; }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-
-        @media (max-width: 640px) {
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(24px, -18px); }
+        }
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shine {
+            0%, 25% { left: -35%; }
+            55%, 100% { left: 125%; }
+        }
+        @media (max-width: 760px) {
+            .steps { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
             .card { padding: 18px 16px; }
-            header { padding: 18px 16px; }
+            header { padding: 20px 16px; border-radius: 0 0 20px 20px; }
+            header h1 { font-size: 1.42rem; }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            body { animation: bgShift 16s ease infinite; }
+            body::before, body::after { animation: drift 14s ease-in-out infinite; }
+            body::after { animation-delay: 4s; }
+            .step { animation: riseIn 0.6s ease both; }
+            .step:nth-child(2) { animation-delay: 0.08s; }
+            .step:nth-child(3) { animation-delay: 0.16s; }
+            .card { animation: riseIn 0.55s ease both; }
+            .btn-submit { animation: bgShift 8s ease infinite; }
+            .btn-submit::after { animation: shine 3.2s ease-in-out infinite; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+                transition-delay: 0ms !important;
+            }
+            .btn-submit::after { display: none; }
         }
     </style>
 </head>
@@ -222,6 +331,11 @@
 </header>
 
 <div class="container">
+    <ol class="steps" aria-label="Шаги заполнения формы">
+        <li class="step step-current" aria-current="step">Шаг 1 · Препарат</li>
+        <li class="step">Шаг 2 · Дизайн и вариабельность</li>
+        <li class="step">Шаг 3 · Популяция</li>
+    </ol>
 
     <!-- ═══════════ FORM ═══════════ -->
     <form id="studyForm" novalidate>
@@ -229,6 +343,7 @@
         <!-- Drug Information -->
         <div class="card">
             <h2>🧪 Информация о препарате</h2>
+            <p class="section-lead">Укажите ключевые свойства тестируемого фармпрепарата и режим его приёма.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="inn">МНН (INN) действующего вещества <span class="hint">*</span></label>
@@ -263,6 +378,7 @@
         <!-- Variability / Design -->
         <div class="card">
             <h2>📊 Вариабельность и дизайн</h2>
+            <p class="section-lead">Выберите параметры вариабельности и предпочтения по протоколу исследования.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="cv_intra">CVintra <span class="hint">(0–1, необязательно)</span></label>
@@ -299,6 +415,7 @@
         <!-- Population -->
         <div class="card">
             <h2>👥 Параметры популяции добровольцев</h2>
+            <p class="section-lead">Определите критерии включения для возраста, пола и ИМТ участников.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="min_age">Минимальный возраст <span class="hint">(≥ 18)</span></label>
