@@ -12,7 +12,7 @@
             --bg: #eef2ff;
             --card-bg: rgba(255, 255, 255, 0.92);
             --text: #1f2340;
-            --text-secondary: #646b8c;
+            --text-secondary: #4f5779;
             --border: #e1e6ff;
             --success: #0d904f;
             --warning: #e8a317;
@@ -46,6 +46,8 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 18px;
+            list-style: none;
+            padding-left: 0;
         }
         .step {
             background: rgba(91, 124, 250, 0.12);
@@ -57,6 +59,10 @@
             font-weight: 600;
             text-align: center;
             letter-spacing: 0.2px;
+        }
+        .step-current {
+            background: rgba(91, 124, 250, 0.2);
+            border-color: rgba(62, 94, 227, 0.36);
         }
         .card {
             background: var(--card-bg);
@@ -87,15 +93,15 @@
         label {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #7077a0;
+            color: var(--text);
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.35px;
         }
         label .hint {
             font-weight: 500;
-            font-size: 0.72rem;
-            color: #8e96bd;
+            font-size: 0.75rem;
+            color: var(--text);
             text-transform: none;
             letter-spacing: 0;
         }
@@ -108,7 +114,7 @@
             transition: border-color 0.2s, box-shadow 0.2s, transform 0.16s;
             color: var(--text);
         }
-        input::placeholder { color: #97a0c8; }
+        input::placeholder { color: var(--text); opacity: 0.65; }
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
@@ -242,11 +248,11 @@
 </header>
 
 <div class="container">
-    <div class="steps">
-        <div class="step">Шаг 1 · Препарат</div>
-        <div class="step">Шаг 2 · Дизайн и вариабельность</div>
-        <div class="step">Шаг 3 · Популяция</div>
-    </div>
+    <ol class="steps" aria-label="Шаги заполнения формы">
+        <li class="step step-current" aria-current="step">Шаг 1 · Препарат</li>
+        <li class="step">Шаг 2 · Дизайн и вариабельность</li>
+        <li class="step">Шаг 3 · Популяция</li>
+    </ol>
 
     <!-- ═══════════ FORM ═══════════ -->
     <form id="studyForm" novalidate>
