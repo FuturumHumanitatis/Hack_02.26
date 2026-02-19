@@ -19,6 +19,9 @@
             --error: #ff7a88;
             --info: #b191ff;
             --input-bg: rgba(18, 13, 36, 0.86);
+            --btn-grad-1: #8e2de2;
+            --btn-grad-2: #ff512f;
+            --btn-grad-3: #dd2476;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -30,7 +33,6 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            animation: bgShift 16s ease infinite;
         }
         body::before, body::after {
             content: "";
@@ -42,7 +44,6 @@
             filter: blur(40px);
             opacity: 0.35;
             pointer-events: none;
-            animation: drift 14s ease-in-out infinite;
         }
         body::before {
             background: #ff5f6d;
@@ -53,7 +54,6 @@
             background: #7f5dff;
             right: -90px;
             bottom: -120px;
-            animation-delay: 4s;
         }
         header {
             background: linear-gradient(130deg, #2d163d 0%, var(--primary-dark) 42%, var(--primary) 100%);
@@ -84,10 +84,7 @@
             font-weight: 600;
             text-align: center;
             letter-spacing: 0.2px;
-            animation: riseIn 0.6s ease both;
         }
-        .step:nth-child(2) { animation-delay: 0.08s; }
-        .step:nth-child(3) { animation-delay: 0.16s; }
         .step-current {
             background: linear-gradient(120deg, rgba(255,122,24,0.22), rgba(164,69,178,0.2));
             border-color: rgba(255, 122, 24, 0.4);
@@ -101,7 +98,6 @@
             backdrop-filter: blur(10px);
             padding: 26px 28px;
             margin-bottom: 18px;
-            animation: riseIn 0.55s ease both;
             transition: transform 0.22s ease, box-shadow 0.22s ease;
         }
         .card:hover {
@@ -154,6 +150,8 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.32), 0 0 18px rgba(255, 60, 172, 0.24);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
             transform: translateY(-1px);
         }
         input[type="number"] { -moz-appearance: textfield; }
@@ -181,7 +179,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(120deg, #8e2de2, #ff512f, #dd2476);
+            background: linear-gradient(120deg, var(--btn-grad-1), var(--btn-grad-2), var(--btn-grad-3));
             background-size: 220% 220%;
             color: #fff;
             border: none;
@@ -194,7 +192,6 @@
             transition: transform 0.14s, box-shadow 0.2s, filter 0.2s;
             position: relative;
             overflow: hidden;
-            animation: bgShift 8s ease infinite;
         }
         .btn-submit::after {
             content: "";
@@ -205,7 +202,6 @@
             height: 400%;
             background: rgba(255, 255, 255, 0.24);
             transform: rotate(25deg);
-            animation: shine 3.2s ease-in-out infinite;
             pointer-events: none;
         }
         .btn-submit:hover { transform: translateY(-1px); filter: brightness(1.06); }
@@ -214,7 +210,6 @@
             background: linear-gradient(120deg, #665979, #827297);
             box-shadow: none;
             cursor: not-allowed;
-            animation: none;
         }
         .spinner {
             display: none;
@@ -307,8 +302,24 @@
             header { padding: 20px 16px; border-radius: 0 0 20px 20px; }
             header h1 { font-size: 1.42rem; }
         }
+        @media (prefers-reduced-motion: no-preference) {
+            body { animation: bgShift 16s ease infinite; }
+            body::before, body::after { animation: drift 14s ease-in-out infinite; }
+            body::after { animation-delay: 4s; }
+            .step { animation: riseIn 0.6s ease both; }
+            .step:nth-child(2) { animation-delay: 0.08s; }
+            .step:nth-child(3) { animation-delay: 0.16s; }
+            .card { animation: riseIn 0.55s ease both; }
+            .btn-submit { animation: bgShift 8s ease infinite; }
+            .btn-submit::after { animation: shine 3.2s ease-in-out infinite; }
+        }
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation: none !important; transition: none !important; }
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+                transition-delay: 0ms !important;
+            }
+            .btn-submit::after { display: none; }
         }
     </style>
 </head>
