@@ -951,11 +951,11 @@
                                class="form-input" placeholder="Введите МНН, например омепразол" autocomplete="off">
                         <div class="quick-fill" id="drugSuggestions">
                             <span class="quick-fill-label">⚡ Быстрый выбор:</span>
-                            <button type="button" class="quick-chip" onclick="selectDrug('омепразол', 20, 'capsule')">Омепразол</button>
-                            <button type="button" class="quick-chip" onclick="selectDrug('метопролол', 50, 'tablet')">Метопролол</button>
-                            <button type="button" class="quick-chip" onclick="selectDrug('амоксициллин', 500, 'capsule')">Амоксициллин</button>
-                            <button type="button" class="quick-chip" onclick="selectDrug('аторвастатин', 20, 'tablet')">Аторвастатин</button>
-                            <button type="button" class="quick-chip" onclick="selectDrug('диклофенак', 50, 'tablet')">Диклофенак</button>
+                            <button type="button" class="quick-chip" data-drug="омепразол" onclick="selectDrug('омепразол', 20, 'capsule')">Омепразол</button>
+                            <button type="button" class="quick-chip" data-drug="метопролол" onclick="selectDrug('метопролол', 50, 'tablet')">Метопролол</button>
+                            <button type="button" class="quick-chip" data-drug="амоксициллин" onclick="selectDrug('амоксициллин', 500, 'capsule')">Амоксициллин</button>
+                            <button type="button" class="quick-chip" data-drug="аторвастатин" onclick="selectDrug('аторвастатин', 20, 'tablet')">Аторвастатин</button>
+                            <button type="button" class="quick-chip" data-drug="диклофенак" onclick="selectDrug('диклофенак', 50, 'tablet')">Диклофенак</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1361,7 +1361,7 @@ function selectDrug(name, dose, form) {
     document.getElementById('dose_mg').classList.remove('error');
     // Update chips
     document.querySelectorAll('.quick-chip').forEach(c => {
-        c.classList.toggle('active', c.textContent.trim().toLowerCase() === name.toLowerCase());
+        c.classList.toggle('active', c.dataset.drug === name);
     });
 }
 
@@ -1505,45 +1505,47 @@ function renderResults(data, payload) {
         ['CVintra', pk.cv_intra, ''],
     ];
     document.getElementById('pkBody').innerHTML = pkRows.map(([p, v, u]) =>
-        '<tr><td><strong>' + p + '</strong>' + (u ? ' <span style="color:var(--text-muted);font-size:0.8rem">(' + u + ')</span>' : '') + '</td>' +
-        '<td>' + (v != null ? v : '<span style="color:var(--text-muted)">—</span>') + '</td></tr>'
+        `<tr><td><strong>${p}</strong>${u ? ` <span style="color:var(--text-muted);font-size:0.8rem">(${u})</span>` : ''}</td>` +
+        `<td>${v != null ? v : '<span style="color:var(--text-muted)">—</span>'}</td></tr>`
     ).join('');
 
     // ── Design ──
     const d = data.design;
-    document.getElementById('designDetails').innerHTML =
-        '<table class="data-table">' +
-        '<tr><td><strong>Название</strong></td><td>' + d.name + '</td></tr>' +
-        '<tr><td><strong>Тип</strong></td><td><span class="tag tag-info">' + d.type + '</span></td></tr>' +
-        '<tr><td><strong>Периоды</strong></td><td>' + d.periods + '</td></tr>' +
-        '<tr><td><strong>Последовательности</strong></td><td>' + d.sequences.map(function(s){ return '<span class="tag tag-info">' + s + '</span>'; }).join(' ') + '</td></tr>' +
-        '<tr><td><strong>Wash-out</strong></td><td>' + d.washout_days + ' дней</td></tr>' +
-        '<tr><td><strong>RSABE</strong></td><td>' + (d.rsabe_applicable
-            ? '<span class="tag tag-success">✓ Да</span>'
-            : '<span class="tag" style="background:#f1f5f9;color:var(--text-muted)">Нет</span>') + '</td></tr>' +
-        '</table>';
+    const seqTags = d.sequences.map(s => `<span class="tag tag-info">${s}</span>`).join(' ');
+    const rsabeTag = d.rsabe_applicable
+        ? '<span class="tag tag-success">✓ Да</span>'
+        : '<span class="tag" style="background:#f1f5f9;color:var(--text-muted)">Нет</span>';
+    document.getElementById('designDetails').innerHTML = `
+        <table class="data-table">
+            <tr><td><strong>Название</strong></td><td>${d.name}</td></tr>
+            <tr><td><strong>Тип</strong></td><td><span class="tag tag-info">${d.type}</span></td></tr>
+            <tr><td><strong>Периоды</strong></td><td>${d.periods}</td></tr>
+            <tr><td><strong>Последовательности</strong></td><td>${seqTags}</td></tr>
+            <tr><td><strong>Wash-out</strong></td><td>${d.washout_days} дней</td></tr>
+            <tr><td><strong>RSABE</strong></td><td>${rsabeTag}</td></tr>
+        </table>`;
 
     // ── Sample size ──
     const s = data.sample_size;
-    document.getElementById('sampleDetails').innerHTML =
-        '<table class="data-table">' +
-        '<tr><td><strong>Базовый N</strong></td><td>' + s.base_n + '</td></tr>' +
-        '<tr><td><strong>N с учётом потерь</strong></td><td><strong style="color:var(--primary);font-size:1.1rem">' + s.adjusted_for_dropout + '</strong></td></tr>' +
-        '<tr><td><strong>Drop-out rate</strong></td><td>' + (s.dropout_rate * 100).toFixed(0) + '%</td></tr>' +
-        '<tr><td><strong>Screen-fail rate</strong></td><td>' + (s.screen_fail_rate * 100).toFixed(0) + '%</td></tr>' +
-        '</table>';
+    document.getElementById('sampleDetails').innerHTML = `
+        <table class="data-table">
+            <tr><td><strong>Базовый N</strong></td><td>${s.base_n}</td></tr>
+            <tr><td><strong>N с учётом потерь</strong></td><td><strong style="color:var(--primary);font-size:1.1rem">${s.adjusted_for_dropout}</strong></td></tr>
+            <tr><td><strong>Drop-out rate</strong></td><td>${(s.dropout_rate * 100).toFixed(0)}%</td></tr>
+            <tr><td><strong>Screen-fail rate</strong></td><td>${(s.screen_fail_rate * 100).toFixed(0)}%</td></tr>
+        </table>`;
 
     // ── Issues ──
     const issuesDiv = document.getElementById('issuesList');
     if (data.issues.length === 0) {
         issuesDiv.innerHTML = '<div class="no-issues">✅ Регуляторных замечаний нет — всё в порядке!</div>';
     } else {
-        issuesDiv.innerHTML = data.issues.map(function(iss) {
-            var icon = iss.severity === 'error' ? '🛑' : (iss.severity === 'warning' ? '⚠️' : 'ℹ️');
-            return '<div class="issue-item ' + iss.severity + '">' +
-                '<span style="font-size:1.2rem;flex-shrink:0">' + icon + '</span>' +
-                '<div class="issue-text"><span class="tag tag-' + iss.severity + '">' + iss.severity.toUpperCase() + '</span> ' +
-                '<strong>[' + iss.code + ']</strong> ' + iss.message + '</div></div>';
+        issuesDiv.innerHTML = data.issues.map(iss => {
+            const icon = iss.severity === 'error' ? '🛑' : (iss.severity === 'warning' ? '⚠️' : 'ℹ️');
+            return `<div class="issue-item ${iss.severity}">
+                <span style="font-size:1.2rem;flex-shrink:0">${icon}</span>
+                <div class="issue-text"><span class="tag tag-${iss.severity}">${iss.severity.toUpperCase()}</span>
+                <strong>[${iss.code}]</strong> ${iss.message}</div></div>`;
         }).join('');
     }
 
@@ -1564,9 +1566,9 @@ document.querySelectorAll('.form-input').forEach(function(input) {
     });
 });
 
-// Keyboard navigation: Enter goes to next step
+// Keyboard navigation: Enter goes to next step (only from text/number inputs)
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA') {
+    if (e.key === 'Enter' && (e.target.type === 'text' || e.target.type === 'number')) {
         if (currentStep < totalSteps) {
             e.preventDefault();
             nextStep();
