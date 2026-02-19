@@ -6,88 +6,114 @@
     <title>Ifarma BE Study Planner</title>
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --text: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
+            --primary: #5b7cfa;
+            --primary-dark: #3e5ee3;
+            --accent: #00c6ff;
+            --bg: #eef2ff;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --text: #1f2340;
+            --text-secondary: #646b8c;
+            --border: #e1e6ff;
             --success: #0d904f;
             --warning: #e8a317;
             --error: #d93025;
-            --info: #1a73e8;
-            --input-bg: #f8f9fa;
+            --info: #3e5ee3;
+            --input-bg: #f8faff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg);
+            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: radial-gradient(circle at 20% 10%, #dbe4ff 0%, transparent 40%),
+                        radial-gradient(circle at 85% 0%, #d7f4ff 0%, transparent 42%),
+                        var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.55;
+            min-height: 100vh;
         }
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(130deg, #2f3a88 0%, var(--primary-dark) 42%, var(--accent) 100%);
             color: #fff;
-            padding: 24px 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 32px;
+            box-shadow: 0 12px 36px rgba(38, 53, 120, 0.28);
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
         }
-        header h1 { font-size: 1.6rem; font-weight: 600; }
-        header p { opacity: 0.85; font-size: 0.95rem; margin-top: 4px; }
-        .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-
-        /* ── Form Card ── */
+        header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.2px; }
+        header p { opacity: 0.9; font-size: 1rem; margin-top: 8px; max-width: 760px; }
+        .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 36px; }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .step {
+            background: rgba(91, 124, 250, 0.12);
+            border: 1px solid rgba(91, 124, 250, 0.2);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--primary-dark);
+            font-size: 0.84rem;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            padding: 28px 32px;
-            margin-bottom: 24px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 32px rgba(56, 74, 155, 0.12);
+            backdrop-filter: blur(4px);
+            padding: 26px 28px;
+            margin-bottom: 18px;
         }
         .card h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+        .section-lead {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 18px;
         }
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px 24px;
+            gap: 14px 18px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
+        .form-group { display: flex; flex-direction: column; }
         label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #7077a0;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
         }
         label .hint {
-            font-weight: 400;
-            font-size: 0.78rem;
-            color: #888;
+            font-weight: 500;
+            font-size: 0.72rem;
+            color: #8e96bd;
+            text-transform: none;
+            letter-spacing: 0;
         }
         input, select {
-            padding: 10px 12px;
+            padding: 12px 13px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.95rem;
             background: var(--input-bg);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.16s;
             color: var(--text);
         }
+        input::placeholder { color: #97a0c8; }
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+            box-shadow: 0 0 0 4px rgba(91,124,250,0.18);
+            transform: translateY(-1px);
         }
         input[type="number"] { -moz-appearance: textfield; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -96,121 +122,115 @@
         .checkbox-group {
             flex-direction: row;
             align-items: center;
-            gap: 8px;
-            padding-top: 20px;
+            gap: 10px;
+            padding-top: 24px;
         }
         .checkbox-group input[type="checkbox"] {
             width: 18px; height: 18px; accent-color: var(--primary);
         }
-        .checkbox-group label { margin-bottom: 0; font-size: 0.92rem; }
-
-        /* ── Button ── */
-        .btn-row { text-align: center; margin-top: 12px; }
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            color: var(--text);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .btn-row { text-align: center; margin-top: 2px; }
         .btn-submit {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: var(--primary);
+            gap: 10px;
+            background: linear-gradient(120deg, var(--primary-dark), var(--primary), var(--accent));
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 12px 36px;
+            border-radius: 12px;
+            padding: 13px 38px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 12px 24px rgba(62, 94, 227, 0.32);
+            transition: transform 0.14s, box-shadow 0.2s, filter 0.2s;
         }
-        .btn-submit:hover { background: var(--primary-dark); }
-        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:hover { transform: translateY(-1px); filter: brightness(1.03); }
+        .btn-submit:active { transform: scale(0.99); }
         .btn-submit:disabled {
-            background: #aaa;
+            background: linear-gradient(120deg, #9aa7dc, #b5c0ea);
+            box-shadow: none;
             cursor: not-allowed;
         }
-
-        /* ── Spinner ── */
         .spinner {
             display: none;
-            width: 22px; height: 22px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255,255,255,0.32);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Results ── */
-        #results { display: none; }
-        .result-section { margin-bottom: 16px; }
-        .result-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
+        #results { display: none; margin-top: 20px; }
+        .result-section { margin-bottom: 14px; }
         table.pk-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
         }
         table.pk-table th, table.pk-table td {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border);
             text-align: left;
         }
         table.pk-table th {
-            background: var(--input-bg);
+            background: #f2f5ff;
             font-weight: 600;
         }
         .tag {
             display: inline-block;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-right: 4px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            margin-right: 6px;
         }
         .tag-info { background: #e8f0fe; color: var(--info); }
-        .tag-warning { background: #fef3cd; color: #856404; }
-        .tag-error { background: #fce8e6; color: var(--error); }
+        .tag-warning { background: #fff3d1; color: #845b00; }
+        .tag-error { background: #ffe9e8; color: var(--error); }
         .issue-item {
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 7px;
+            border-radius: 8px;
             border-left: 4px solid var(--border);
-            background: var(--input-bg);
+            background: #f8faff;
             font-size: 0.9rem;
         }
         .issue-item.info { border-left-color: var(--info); }
         .issue-item.warning { border-left-color: var(--warning); }
         .issue-item.error { border-left-color: var(--error); }
         .synopsis-box {
-            background: var(--input-bg);
+            background: #f8faff;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 10px;
+            padding: 16px 18px;
             font-size: 0.88rem;
-            line-height: 1.7;
+            line-height: 1.65;
             white-space: pre-wrap;
             max-height: 600px;
             overflow-y: auto;
         }
         .error-box {
-            background: #fce8e6;
+            background: #ffe9e8;
             border: 1px solid var(--error);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 14px 18px;
             color: var(--error);
             font-size: 0.92rem;
         }
-        .no-issues {
-            color: var(--success);
-            font-weight: 500;
-        }
-
-        @media (max-width: 640px) {
+        .no-issues { color: var(--success); font-weight: 600; }
+        @media (max-width: 760px) {
+            .steps { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
             .card { padding: 18px 16px; }
-            header { padding: 18px 16px; }
+            header { padding: 20px 16px; border-radius: 0 0 20px 20px; }
+            header h1 { font-size: 1.42rem; }
         }
     </style>
 </head>
@@ -222,6 +242,11 @@
 </header>
 
 <div class="container">
+    <div class="steps">
+        <div class="step">Шаг 1 · Препарат</div>
+        <div class="step">Шаг 2 · Дизайн и вариабельность</div>
+        <div class="step">Шаг 3 · Популяция</div>
+    </div>
 
     <!-- ═══════════ FORM ═══════════ -->
     <form id="studyForm" novalidate>
@@ -229,6 +254,7 @@
         <!-- Drug Information -->
         <div class="card">
             <h2>🧪 Информация о препарате</h2>
+            <p class="section-lead">Укажите ключевые свойства тестируемого фармпрепарата и режим его приёма.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="inn">МНН (INN) действующего вещества <span class="hint">*</span></label>
@@ -263,6 +289,7 @@
         <!-- Variability / Design -->
         <div class="card">
             <h2>📊 Вариабельность и дизайн</h2>
+            <p class="section-lead">Выберите параметры вариабельности и предпочтения по протоколу исследования.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="cv_intra">CVintra <span class="hint">(0–1, необязательно)</span></label>
@@ -299,6 +326,7 @@
         <!-- Population -->
         <div class="card">
             <h2>👥 Параметры популяции добровольцев</h2>
+            <p class="section-lead">Определите критерии включения для возраста, пола и ИМТ участников.</p>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="min_age">Минимальный возраст <span class="hint">(≥ 18)</span></label>
