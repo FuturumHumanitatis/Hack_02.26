@@ -4,397 +4,1385 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ifarma BE Study Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ═══════════════════════════════════════════════════
+           CSS CUSTOM PROPERTIES
+           ═══════════════════════════════════════════════════ */
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --text: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
-            --success: #0d904f;
-            --warning: #e8a317;
-            --error: #d93025;
-            --info: #1a73e8;
-            --input-bg: #f8f9fa;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --primary-bg: rgba(99,102,241,0.08);
+            --accent: #06b6d4;
+            --accent-light: #22d3ee;
+
+            --bg: #f8fafc;
+            --bg-subtle: #f1f5f9;
+            --surface: #ffffff;
+            --surface-hover: #f8fafc;
+
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            --border: #e2e8f0;
+            --border-focus: var(--primary);
+
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --error: #ef4444;
+            --error-bg: #fef2f2;
+            --info: #6366f1;
+            --info-bg: #eef2ff;
+
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ═══════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: var(--font);
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: #fff;
-            padding: 24px 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        header h1 { font-size: 1.6rem; font-weight: 600; }
-        header p { opacity: 0.85; font-size: 0.95rem; margin-top: 4px; }
-        .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
 
-        /* ── Form Card ── */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            padding: 28px 32px;
-            margin-bottom: 24px;
+        /* ═══════════════════════════════════════════════════
+           ANIMATED BACKGROUND
+           ═══════════════════════════════════════════════════ */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
         }
-        .card h2 {
-            font-size: 1.15rem;
+        .bg-pattern::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+            top: -200px; right: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+        .bg-pattern::after {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
+            bottom: -150px; left: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════ */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 30%, #818cf8 70%, #06b6d4 100%);
+            color: #fff;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .header-inner {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 32px 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-icon {
+            width: 56px; height: 56px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+        .header-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+        .header-text p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+        .header-badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-badge .dot {
+            width: 8px; height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════════════ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 48px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           STEPPER (WIZARD PROGRESS)
+           ═══════════════════════════════════════════════════ */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 36px;
+            padding: 0 20px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition);
+        }
+        .step-number {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
+            border: 2px solid var(--border);
+            color: var(--text-muted);
+            background: var(--surface);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }
+        .step-label {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color var(--transition);
+            white-space: nowrap;
+        }
+        .step.active .step-number {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.2);
+        }
+        .step.active .step-label { color: var(--text); }
+        .step.completed .step-number {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        .step.completed .step-label { color: var(--text-secondary); }
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            margin: 0 12px;
+            transition: background 0.3s ease;
+            min-width: 40px;
+        }
+        .step-line.completed { background: var(--success); }
+
+        /* ═══════════════════════════════════════════════════
+           CARD (FORM PANELS)
+           ═══════════════════════════════════════════════════ */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Form Step Panels */
+        .form-panel {
+            display: none;
+            animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-panel.active { display: block; }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .section-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .section-icon.drug { background: linear-gradient(135deg, #dbeafe, #ede9fe); }
+        .section-icon.stats { background: linear-gradient(135deg, #fce7f3, #fae8ff); }
+        .section-icon.population { background: linear-gradient(135deg, #d1fae5, #cffafe); }
+        .section-title h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        .section-title p {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FORM ELEMENTS
+           ═══════════════════════════════════════════════════ */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px 24px;
+            gap: 20px 24px;
         }
         .form-group {
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .form-group.full-width {
             grid-column: 1 / -1;
         }
-        label {
-            font-size: 0.85rem;
-            font-weight: 500;
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.01em;
         }
-        label .hint {
+        .form-label .required {
+            color: var(--error);
+            font-weight: 700;
+        }
+        .form-label .optional {
             font-weight: 400;
-            font-size: 0.78rem;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-subtle);
+            padding: 1px 8px;
+            border-radius: 4px;
         }
-        input, select {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: var(--input-bg);
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* Input / Select */
+        .form-input, .form-select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            font-family: var(--font);
+            background: var(--surface);
             color: var(--text);
+            transition: all var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
         }
-        input:focus, select:focus {
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .form-input:hover, .form-select:hover {
+            border-color: #cbd5e1;
+        }
+        .form-input:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+        .form-input.error { border-color: var(--error); }
+        .form-input.error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+
+        /* Custom select arrow */
+        .select-wrap {
+            position: relative;
+        }
+        .select-wrap::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0; height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--text-muted);
+            pointer-events: none;
+        }
+        .form-select {
+            padding-right: 36px;
+            cursor: pointer;
         }
         input[type="number"] { -moz-appearance: textfield; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-            -webkit-appearance: none; margin: 0;
-        }
-        .checkbox-group {
-            flex-direction: row;
-            align-items: center;
-            gap: 8px;
-            padding-top: 20px;
-        }
-        .checkbox-group input[type="checkbox"] {
-            width: 18px; height: 18px; accent-color: var(--primary);
-        }
-        .checkbox-group label { margin-bottom: 0; font-size: 0.92rem; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* ── Button ── */
-        .btn-row { text-align: center; margin-top: 12px; }
-        .btn-submit {
+        /* Toggle (checkbox replacement) */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-subtle);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .toggle-group:hover { border-color: var(--border); background: var(--surface); }
+        .toggle-track {
+            width: 44px; height: 24px;
+            background: #cbd5e1;
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            top: 3px; left: 3px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .toggle-group input { display: none; }
+        .toggle-group input:checked + .toggle-track {
+            background: var(--primary);
+        }
+        .toggle-group input:checked + .toggle-track::after {
+            transform: translateX(20px);
+        }
+        .toggle-label {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           NAVIGATION BUTTONS
+           ═══════════════════════════════════════════════════ */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            gap: 12px;
+        }
+        .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 36px;
-            font-size: 1rem;
+            font-family: var(--font);
+            font-size: 0.92rem;
             font-weight: 600;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: none;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: all var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
         }
-        .btn-submit:hover { background: var(--primary-dark); }
-        .btn-submit:active { transform: scale(0.98); }
-        .btn-submit:disabled {
-            background: #aaa;
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: #cbd5e1;
+            color: var(--text);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active { transform: translateY(0) scale(0.98); }
+        .btn-primary:disabled {
+            background: #94a3b8;
+            box-shadow: none;
             cursor: not-allowed;
+            transform: none;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            padding: 14px 40px;
+            font-size: 1rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 12px rgba(16,185,129,0.3);
+        }
+        .btn-submit:hover {
+            box-shadow: 0 6px 24px rgba(16,185,129,0.4);
+            transform: translateY(-2px);
+        }
+        .btn-submit:active { transform: translateY(0) scale(0.98); }
+        .btn-submit:disabled {
+            background: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-icon {
+            font-size: 1.1rem;
+            line-height: 1;
         }
 
-        /* ── Spinner ── */
+        /* ═══════════════════════════════════════════════════
+           SPINNER
+           ═══════════════════════════════════════════════════ */
         .spinner {
             display: none;
-            width: 22px; height: 22px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 20px; height: 20px;
+            border: 2.5px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Results ── */
+        /* ═══════════════════════════════════════════════════
+           RESULTS SECTION
+           ═══════════════════════════════════════════════════ */
         #results { display: none; }
-        .result-section { margin-bottom: 16px; }
-        .result-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
+        #results.visible {
+            display: block;
+            animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        table.pk-table {
-            width: 100%;
-            border-collapse: collapse;
+        .results-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .results-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .results-header p {
             font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
-        table.pk-table th, table.pk-table td {
-            padding: 8px 12px;
+
+        /* Summary Strip */
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .summary-card {
+            background: var(--surface);
             border: 1px solid var(--border);
-            text-align: left;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            transition: all var(--transition);
         }
-        table.pk-table th {
-            background: var(--input-bg);
-            font-weight: 600;
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
-        .tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-right: 4px;
+        .summary-card .sc-icon { font-size: 1.6rem; margin-bottom: 8px; }
+        .summary-card .sc-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.2;
         }
-        .tag-info { background: #e8f0fe; color: var(--info); }
-        .tag-warning { background: #fef3cd; color: #856404; }
-        .tag-error { background: #fce8e6; color: var(--error); }
-        .issue-item {
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            border-radius: 6px;
-            border-left: 4px solid var(--border);
-            background: var(--input-bg);
-            font-size: 0.9rem;
-        }
-        .issue-item.info { border-left-color: var(--info); }
-        .issue-item.warning { border-left-color: var(--warning); }
-        .issue-item.error { border-left-color: var(--error); }
-        .synopsis-box {
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 20px;
-            font-size: 0.88rem;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        .error-box {
-            background: #fce8e6;
-            border: 1px solid var(--error);
-            border-radius: 8px;
-            padding: 14px 18px;
-            color: var(--error);
-            font-size: 0.92rem;
-        }
-        .no-issues {
-            color: var(--success);
+        .summary-card .sc-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
             font-weight: 500;
         }
 
-        @media (max-width: 640px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .card { padding: 18px 16px; }
-            header { padding: 18px 16px; }
+        /* Result Card */
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all var(--transition);
         }
+        .result-card:hover { box-shadow: var(--shadow-md); }
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 24px;
+            background: var(--bg-subtle);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        .result-card-header .rc-icon {
+            width: 36px; height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .rc-icon.pk { background: linear-gradient(135deg, #dbeafe, #e0e7ff); }
+        .rc-icon.design { background: linear-gradient(135deg, #fce7f3, #ede9fe); }
+        .rc-icon.sample { background: linear-gradient(135deg, #d1fae5, #cffafe); }
+        .rc-icon.issues { background: linear-gradient(135deg, #fef3c7, #fce7f3); }
+        .rc-icon.synopsis { background: linear-gradient(135deg, #e0e7ff, #dbeafe); }
+        .result-card-header h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
+        }
+        .result-card-header .collapse-icon {
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+        .result-card.collapsed .collapse-icon { transform: rotate(-90deg); }
+        .result-card-body {
+            padding: 20px 24px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .result-card.collapsed .result-card-body {
+            max-height: 0;
+            padding: 0 24px;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.88rem;
+        }
+        .data-table th, .data-table td {
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table th {
+            background: var(--bg-subtle);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: var(--bg-subtle); }
+        .data-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+        .data-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+
+        /* Tags / Badges */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .tag-info { background: var(--info-bg); color: var(--info); }
+        .tag-warning { background: var(--warning-bg); color: #b45309; }
+        .tag-error { background: var(--error-bg); color: var(--error); }
+        .tag-success { background: var(--success-bg); color: #047857; }
+
+        /* Issue Items */
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            transition: all var(--transition);
+        }
+        .issue-item:last-child { margin-bottom: 0; }
+        .issue-item:hover { box-shadow: var(--shadow-sm); }
+        .issue-item.info { background: var(--info-bg); border-color: rgba(99,102,241,0.2); }
+        .issue-item.warning { background: var(--warning-bg); border-color: rgba(245,158,11,0.2); }
+        .issue-item.error { background: var(--error-bg); border-color: rgba(239,68,68,0.2); }
+        .issue-text strong { font-weight: 600; }
+        .no-issues {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 12px 0;
+        }
+
+        /* Synopsis Box */
+        .synopsis-box {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            font-size: 0.87rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .synopsis-box::-webkit-scrollbar { width: 6px; }
+        .synopsis-box::-webkit-scrollbar-track { background: transparent; }
+        .synopsis-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* Error Box */
+        .error-box {
+            background: var(--error-bg);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            color: var(--error);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .error-box .err-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+        /* ═══════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════ */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .header-inner { flex-wrap: wrap; padding: 24px 20px; }
+            .header-badge { margin-left: 0; margin-top: 8px; width: 100%; justify-content: center; }
+            .container { padding: 20px 16px 40px; }
+            .card { padding: 24px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stepper { flex-wrap: wrap; gap: 8px; justify-content: center; }
+            .step-line { display: none; }
+            .step { gap: 6px; }
+            .step-label { font-size: 0.75rem; }
+            .summary-strip { grid-template-columns: repeat(2, 1fr); }
+            .nav-buttons { flex-wrap: wrap; }
+            .btn { flex: 1; min-width: 120px; }
+            .result-card-body { padding: 16px; }
+            .result-card-header { padding: 14px 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .header-text h1 { font-size: 1.2rem; }
+            .summary-strip { grid-template-columns: 1fr 1fr; }
+            .step-number { width: 32px; height: 32px; font-size: 0.8rem; }
+        }
+
+        /* ═══════════════════════════════════════════════════
+           QUICK-FILL / DRUG SUGGESTIONS
+           ═══════════════════════════════════════════════════ */
+        .quick-fill {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .quick-fill-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 4px;
+        }
+        .quick-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font);
+        }
+        .quick-chip:hover {
+            background: var(--primary-bg);
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+        .quick-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RANGE SLIDER (for age/BMI)
+           ═══════════════════════════════════════════════════ */
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .range-row .form-input {
+            width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .range-separator {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           PILL SELECTOR (radio replacement)
+           ═══════════════════════════════════════════════════ */
+        .pill-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 24px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+            user-select: none;
+            font-family: var(--font);
+        }
+        .pill:hover { border-color: var(--primary-light); color: var(--text); }
+        .pill input { display: none; }
+        .pill.active {
+            background: var(--primary-bg);
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        .pill .pill-icon { font-size: 1rem; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>💊 Ifarma BE Study Planner</h1>
-    <p>Планирование исследований биоэквивалентности — ввод параметров</p>
+<div class="bg-pattern"></div>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+    <div class="header-inner">
+        <div class="header-icon">💊</div>
+        <div class="header-text">
+            <h1>Ifarma BE Study Planner</h1>
+            <p>Планирование исследований биоэквивалентности</p>
+        </div>
+        <div class="header-badge">
+            <span class="dot"></span>
+            Прототип v0.1
+        </div>
+    </div>
 </header>
 
 <div class="container">
 
-    <!-- ═══════════ FORM ═══════════ -->
+    <!-- ═══════════════ STEPPER ═══════════════ -->
+    <div class="stepper" id="stepper">
+        <div class="step active" data-step="1" onclick="goToStep(1)">
+            <div class="step-number">1</div>
+            <span class="step-label">Препарат</span>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" data-step="2" onclick="goToStep(2)">
+            <div class="step-number">2</div>
+            <span class="step-label">Дизайн</span>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" data-step="3" onclick="goToStep(3)">
+            <div class="step-number">3</div>
+            <span class="step-label">Популяция</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════ FORM ═══════════════ -->
     <form id="studyForm" novalidate>
 
-        <!-- Drug Information -->
-        <div class="card">
-            <h2>🧪 Информация о препарате</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="inn">МНН (INN) действующего вещества <span class="hint">*</span></label>
-                    <input type="text" id="inn" name="inn" required
-                           placeholder="напр. омепразол" autocomplete="off">
+        <!-- ── STEP 1: Drug Info ── -->
+        <div class="form-panel active" id="panel1">
+            <div class="card">
+                <div class="section-header">
+                    <div class="section-icon drug">🧪</div>
+                    <div class="section-title">
+                        <h2>Информация о препарате</h2>
+                        <p>Укажите основные характеристики исследуемого препарата</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="dose_mg">Дозировка, мг <span class="hint">*</span></label>
-                    <input type="number" id="dose_mg" name="dose_mg" required
-                           min="0.01" step="any" placeholder="напр. 20">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            МНН (INN) действующего вещества
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="inn" name="inn" required
+                               class="form-input" placeholder="Введите МНН, например омепразол" autocomplete="off">
+                        <div class="quick-fill" id="drugSuggestions">
+                            <span class="quick-fill-label">⚡ Быстрый выбор:</span>
+                            <button type="button" class="quick-chip" onclick="selectDrug('омепразол', 20, 'capsule')">Омепразол</button>
+                            <button type="button" class="quick-chip" onclick="selectDrug('метопролол', 50, 'tablet')">Метопролол</button>
+                            <button type="button" class="quick-chip" onclick="selectDrug('амоксициллин', 500, 'capsule')">Амоксициллин</button>
+                            <button type="button" class="quick-chip" onclick="selectDrug('аторвастатин', 20, 'tablet')">Аторвастатин</button>
+                            <button type="button" class="quick-chip" onclick="selectDrug('диклофенак', 50, 'tablet')">Диклофенак</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Дозировка, мг
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" id="dose_mg" name="dose_mg" required
+                               class="form-input" min="0.01" step="any" placeholder="20">
+                        <div class="form-hint">Укажите дозировку одной единицы в миллиграммах</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Лекарственная форма</label>
+                        <div class="pill-group" id="formPills">
+                            <label class="pill active" onclick="selectPill(this, 'formPills', 'form')">
+                                <input type="radio" name="form_radio" value="tablet" checked>
+                                <span class="pill-icon">💊</span> Таблетка
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'formPills', 'form')">
+                                <input type="radio" name="form_radio" value="capsule">
+                                <span class="pill-icon">💎</span> Капсула
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'formPills', 'form')">
+                                <input type="radio" name="form_radio" value="solution">
+                                <span class="pill-icon">🧴</span> Раствор
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'formPills', 'form')">
+                                <input type="radio" name="form_radio" value="other">
+                                <span class="pill-icon">📦</span> Другое
+                            </label>
+                        </div>
+                        <!-- Hidden select for payload -->
+                        <select id="form" name="form" style="display:none">
+                            <option value="tablet" selected>Таблетка</option>
+                            <option value="capsule">Капсула</option>
+                            <option value="solution">Раствор</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Режим приёма</label>
+                        <div class="pill-group" id="regimePills">
+                            <label class="pill active" onclick="selectPill(this, 'regimePills', 'regime')">
+                                <input type="radio" name="regime_radio" value="fasted" checked>
+                                <span class="pill-icon">🍽️</span> Натощак
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'regimePills', 'regime')">
+                                <input type="radio" name="regime_radio" value="fed">
+                                <span class="pill-icon">🥗</span> После еды
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'regimePills', 'regime')">
+                                <input type="radio" name="regime_radio" value="both">
+                                <span class="pill-icon">🔄</span> Оба
+                            </label>
+                        </div>
+                        <select id="regime" name="regime" style="display:none">
+                            <option value="fasted" selected>Натощак</option>
+                            <option value="fed">После еды</option>
+                            <option value="both">Оба</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="form">Лекарственная форма</label>
-                    <select id="form" name="form">
-                        <option value="tablet">Таблетка</option>
-                        <option value="capsule">Капсула</option>
-                        <option value="solution">Раствор</option>
-                        <option value="other">Другое</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="regime">Режим приёма</label>
-                    <select id="regime" name="regime">
-                        <option value="fasted">Натощак</option>
-                        <option value="fed">После еды</option>
-                        <option value="both">Оба</option>
-                    </select>
+
+                <div class="nav-buttons">
+                    <div></div>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                        Далее <span class="btn-icon">→</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Variability / Design -->
-        <div class="card">
-            <h2>📊 Вариабельность и дизайн</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="cv_intra">CVintra <span class="hint">(0–1, необязательно)</span></label>
-                    <input type="number" id="cv_intra" name="cv_intra"
-                           min="0" max="1" step="0.01" placeholder="напр. 0.25">
+        <!-- ── STEP 2: Variability & Design ── -->
+        <div class="form-panel" id="panel2">
+            <div class="card">
+                <div class="section-header">
+                    <div class="section-icon stats">📊</div>
+                    <div class="section-title">
+                        <h2>Вариабельность и дизайн</h2>
+                        <p>Настройте статистические параметры и предпочтительный дизайн</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="cv_category">Категория CVintra <span class="hint">(если число не задано)</span></label>
-                    <select id="cv_category" name="cv_category">
-                        <option value="">— не выбрано —</option>
-                        <option value="low">Низкая (low)</option>
-                        <option value="high">Высокая (high)</option>
-                    </select>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            CVintra
+                            <span class="optional">необязательно</span>
+                        </label>
+                        <input type="number" id="cv_intra" name="cv_intra"
+                               class="form-input" min="0" max="1" step="0.01" placeholder="0.25">
+                        <div class="form-hint">Внутрисубъектная вариабельность как доля (0–1)</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Категория CVintra
+                            <span class="optional">если число не задано</span>
+                        </label>
+                        <div class="select-wrap">
+                            <select id="cv_category" name="cv_category" class="form-select">
+                                <option value="">— не выбрано —</option>
+                                <option value="low">Низкая (low) — CV ≤ 0.30</option>
+                                <option value="high">Высокая (high) — CV > 0.30</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Тип исследования</label>
+                        <div class="pill-group" id="studyTypePills">
+                            <label class="pill active" onclick="selectPill(this, 'studyTypePills', 'study_type')">
+                                <input type="radio" name="study_type_radio" value="single" checked>
+                                Однофазное
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'studyTypePills', 'study_type')">
+                                <input type="radio" name="study_type_radio" value="two_stage">
+                                Двухфазное (адаптивное)
+                            </label>
+                        </div>
+                        <select id="study_type" name="study_type" style="display:none">
+                            <option value="single" selected>Однофазное</option>
+                            <option value="two_stage">Двухфазное</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Предпочтительный дизайн
+                            <span class="optional">необязательно</span>
+                        </label>
+                        <input type="text" id="preferred_design" name="preferred_design"
+                               class="form-input" placeholder="напр. 2x2, 2x3x3">
+                        <div class="form-hint">Система автоматически подберёт оптимальный дизайн, если не указан</div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="toggle-group" id="rsabeToggle">
+                            <input type="checkbox" id="need_rsabe" name="need_rsabe">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-label">Применить RSABE (Reference-Scaled Average Bioequivalence)</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="study_type">Тип исследования</label>
-                    <select id="study_type" name="study_type">
-                        <option value="single">Однофазное</option>
-                        <option value="two_stage">Двухфазное (адаптивное)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="preferred_design">Предпочтительный дизайн <span class="hint">(необязательно)</span></label>
-                    <input type="text" id="preferred_design" name="preferred_design"
-                           placeholder="напр. 2x2">
-                </div>
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="need_rsabe" name="need_rsabe">
-                    <label for="need_rsabe">Необходимость применения RSABE</label>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                        <span class="btn-icon">←</span> Назад
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                        Далее <span class="btn-icon">→</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Population -->
-        <div class="card">
-            <h2>👥 Параметры популяции добровольцев</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="min_age">Минимальный возраст <span class="hint">(≥ 18)</span></label>
-                    <input type="number" id="min_age" name="min_age"
-                           value="18" min="18" max="65">
+        <!-- ── STEP 3: Population ── -->
+        <div class="form-panel" id="panel3">
+            <div class="card">
+                <div class="section-header">
+                    <div class="section-icon population">👥</div>
+                    <div class="section-title">
+                        <h2>Параметры популяции добровольцев</h2>
+                        <p>Определите критерии включения добровольцев в исследование</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="max_age">Максимальный возраст <span class="hint">(≤ 65)</span></label>
-                    <input type="number" id="max_age" name="max_age"
-                           value="55" min="18" max="65">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Возраст (лет)</label>
+                        <div class="range-row">
+                            <input type="number" id="min_age" name="min_age"
+                                   class="form-input" value="18" min="18" max="65">
+                            <span class="range-separator">—</span>
+                            <input type="number" id="max_age" name="max_age"
+                                   class="form-input" value="55" min="18" max="65">
+                        </div>
+                        <div class="form-hint">От 18 до 65 лет</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Пол добровольцев</label>
+                        <div class="pill-group" id="sexPills">
+                            <label class="pill active" onclick="selectPill(this, 'sexPills', 'sex')">
+                                <input type="radio" name="sex_radio" value="both" checked>
+                                👫 М и Ж
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'sexPills', 'sex')">
+                                <input type="radio" name="sex_radio" value="male">
+                                👨 Мужской
+                            </label>
+                            <label class="pill" onclick="selectPill(this, 'sexPills', 'sex')">
+                                <input type="radio" name="sex_radio" value="female">
+                                👩 Женский
+                            </label>
+                        </div>
+                        <select id="sex" name="sex" style="display:none">
+                            <option value="both" selected>Мужской и женский</option>
+                            <option value="male">Мужской</option>
+                            <option value="female">Женский</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ИМТ (кг/м²)</label>
+                        <div class="range-row">
+                            <input type="number" id="bmi_min" name="bmi_min"
+                                   class="form-input" value="18.5" min="10" max="50" step="0.1">
+                            <span class="range-separator">—</span>
+                            <input type="number" id="bmi_max" name="bmi_max"
+                                   class="form-input" value="30.0" min="10" max="60" step="0.1">
+                        </div>
+                        <div class="form-hint">Индекс массы тела (стандарт: 18.5–30.0)</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="sex">Пол добровольцев</label>
-                    <select id="sex" name="sex">
-                        <option value="both">Мужской и женский</option>
-                        <option value="male">Мужской</option>
-                        <option value="female">Женский</option>
-                    </select>
-                </div>
-                <div class="form-group" style="visibility:hidden">
-                    <!-- spacer for grid alignment -->
-                </div>
-                <div class="form-group">
-                    <label for="bmi_min">Минимальный ИМТ</label>
-                    <input type="number" id="bmi_min" name="bmi_min"
-                           value="18.5" min="10" max="50" step="0.1">
-                </div>
-                <div class="form-group">
-                    <label for="bmi_max">Максимальный ИМТ</label>
-                    <input type="number" id="bmi_max" name="bmi_max"
-                           value="30.0" min="10" max="60" step="0.1">
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                        <span class="btn-icon">←</span> Назад
+                    </button>
+                    <button type="submit" class="btn btn-submit" id="submitBtn">
+                        <span id="btnText">🚀 Рассчитать план исследования</span>
+                        <span class="spinner" id="spinner"></span>
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <div class="btn-row">
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <span id="btnText">Рассчитать план исследования</span>
-                <span class="spinner" id="spinner"></span>
-            </button>
         </div>
     </form>
 
-    <!-- ═══════════ RESULTS ═══════════ -->
+    <!-- ═══════════════ RESULTS ═══════════════ -->
     <div id="results">
 
         <!-- Error -->
-        <div id="errorBox" class="error-box" style="display:none;margin-bottom:20px;"></div>
+        <div id="errorBox" class="error-box" style="display:none;">
+            <span class="err-icon">⚠️</span>
+            <span id="errorText"></span>
+        </div>
+
+        <div class="results-header" id="resultsHeader" style="display:none;">
+            <h2>📋 Результаты планирования</h2>
+            <p>Автоматически подобранные параметры исследования биоэквивалентности</p>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="summary-strip" id="summaryStrip" style="display:none;"></div>
 
         <!-- PK Parameters -->
-        <div class="card result-section" id="resPK">
-            <h2>📈 Фармакокинетические параметры</h2>
-            <table class="pk-table">
-                <thead>
-                    <tr><th>Параметр</th><th>Значение</th></tr>
-                </thead>
-                <tbody id="pkBody"></tbody>
-            </table>
+        <div class="result-card" id="resPK" style="display:none;">
+            <div class="result-card-header" onclick="toggleCard('resPK')">
+                <div class="rc-icon pk">📈</div>
+                <h3>Фармакокинетические параметры</h3>
+                <span class="collapse-icon">▾</span>
+            </div>
+            <div class="result-card-body">
+                <table class="data-table">
+                    <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+                    <tbody id="pkBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Design -->
-        <div class="card result-section" id="resDesign">
-            <h2>🔬 Выбранный дизайн исследования</h2>
-            <div id="designDetails"></div>
+        <div class="result-card" id="resDesign" style="display:none;">
+            <div class="result-card-header" onclick="toggleCard('resDesign')">
+                <div class="rc-icon design">🔬</div>
+                <h3>Выбранный дизайн исследования</h3>
+                <span class="collapse-icon">▾</span>
+            </div>
+            <div class="result-card-body" id="designDetails"></div>
         </div>
 
         <!-- Sample Size -->
-        <div class="card result-section" id="resSample">
-            <h2>🔢 Размер выборки</h2>
-            <div id="sampleDetails"></div>
+        <div class="result-card" id="resSample" style="display:none;">
+            <div class="result-card-header" onclick="toggleCard('resSample')">
+                <div class="rc-icon sample">🔢</div>
+                <h3>Размер выборки</h3>
+                <span class="collapse-icon">▾</span>
+            </div>
+            <div class="result-card-body" id="sampleDetails"></div>
         </div>
 
         <!-- Regulatory Issues -->
-        <div class="card result-section" id="resIssues">
-            <h2>⚠️ Регуляторные замечания</h2>
-            <div id="issuesList"></div>
+        <div class="result-card" id="resIssues" style="display:none;">
+            <div class="result-card-header" onclick="toggleCard('resIssues')">
+                <div class="rc-icon issues">⚠️</div>
+                <h3>Регуляторные замечания</h3>
+                <span class="collapse-icon">▾</span>
+            </div>
+            <div class="result-card-body" id="issuesList"></div>
         </div>
 
         <!-- Synopsis -->
-        <div class="card result-section" id="resSynopsis">
-            <h2>📝 Синопсис протокола</h2>
-            <div class="synopsis-box" id="synopsisContent"></div>
+        <div class="result-card" id="resSynopsis" style="display:none;">
+            <div class="result-card-header" onclick="toggleCard('resSynopsis')">
+                <div class="rc-icon synopsis">📝</div>
+                <h3>Синопсис протокола</h3>
+                <span class="collapse-icon">▾</span>
+            </div>
+            <div class="result-card-body">
+                <div class="synopsis-box" id="synopsisContent"></div>
+            </div>
         </div>
     </div>
 
 </div>
 
+<footer class="footer">
+    Ifarma BE Study Planner — прототип для SechenovTech Hackathon
+</footer>
+
 <script>
+/* ═══════════════════════════════════════════════════
+   WIZARD / STEPPER LOGIC
+   ═══════════════════════════════════════════════════ */
+let currentStep = 1;
+const totalSteps = 3;
+
+function goToStep(step) {
+    if (step < 1 || step > totalSteps) return;
+    // Validate before moving forward
+    if (step > currentStep && !validateCurrentStep()) return;
+
+    currentStep = step;
+    updateStepper();
+    updatePanels();
+}
+
+function nextStep() {
+    if (!validateCurrentStep()) return;
+    goToStep(currentStep + 1);
+}
+
+function prevStep() {
+    goToStep(currentStep - 1);
+}
+
+function updateStepper() {
+    document.querySelectorAll('.step').forEach((s, i) => {
+        const stepNum = i + 1;
+        s.classList.remove('active', 'completed');
+        if (stepNum === currentStep) s.classList.add('active');
+        else if (stepNum < currentStep) s.classList.add('completed');
+    });
+    document.querySelectorAll('.step-line').forEach((l, i) => {
+        l.classList.toggle('completed', i + 1 < currentStep);
+    });
+}
+
+function updatePanels() {
+    document.querySelectorAll('.form-panel').forEach((p, i) => {
+        p.classList.toggle('active', i + 1 === currentStep);
+    });
+}
+
+function validateCurrentStep() {
+    if (currentStep === 1) {
+        const inn = document.getElementById('inn').value.trim();
+        const dose = parseFloat(document.getElementById('dose_mg').value);
+        const innInput = document.getElementById('inn');
+        const doseInput = document.getElementById('dose_mg');
+
+        let valid = true;
+        innInput.classList.remove('error');
+        doseInput.classList.remove('error');
+
+        if (!inn) {
+            innInput.classList.add('error');
+            innInput.focus();
+            valid = false;
+        }
+        if (isNaN(dose) || dose <= 0) {
+            doseInput.classList.add('error');
+            if (valid) doseInput.focus();
+            valid = false;
+        }
+        return valid;
+    }
+    return true;
+}
+
+/* ═══════════════════════════════════════════════════
+   PILL SELECTOR
+   ═══════════════════════════════════════════════════ */
+function selectPill(el, groupId, hiddenSelectId) {
+    const group = document.getElementById(groupId);
+    group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    const val = el.querySelector('input').value;
+    const sel = document.getElementById(hiddenSelectId);
+    sel.value = val;
+}
+
+/* ═══════════════════════════════════════════════════
+   QUICK-FILL DRUG SELECTION
+   ═══════════════════════════════════════════════════ */
+function selectDrug(name, dose, form) {
+    document.getElementById('inn').value = name;
+    document.getElementById('dose_mg').value = dose;
+    // Update form pills
+    const formSel = document.getElementById('form');
+    formSel.value = form;
+    document.querySelectorAll('#formPills .pill').forEach(p => {
+        const radio = p.querySelector('input');
+        p.classList.toggle('active', radio.value === form);
+        radio.checked = (radio.value === form);
+    });
+    // Clear errors
+    document.getElementById('inn').classList.remove('error');
+    document.getElementById('dose_mg').classList.remove('error');
+    // Update chips
+    document.querySelectorAll('.quick-chip').forEach(c => {
+        c.classList.toggle('active', c.textContent.trim().toLowerCase() === name.toLowerCase());
+    });
+}
+
+/* ═══════════════════════════════════════════════════
+   COLLAPSIBLE RESULT CARDS
+   ═══════════════════════════════════════════════════ */
+function toggleCard(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM SUBMISSION
+   ═══════════════════════════════════════════════════ */
 document.getElementById('studyForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const btn = document.getElementById('submitBtn');
     const spinner = document.getElementById('spinner');
     const btnText = document.getElementById('btnText');
-    const resultsDiv = document.getElementById('results');
     const errorBox = document.getElementById('errorBox');
+    const errorText = document.getElementById('errorText');
 
     // Build payload
     const payload = {
@@ -426,14 +1414,9 @@ document.getElementById('studyForm').addEventListener('submit', async function(e
 
     // Validate required
     if (!payload.inn || isNaN(payload.dose_mg) || payload.dose_mg <= 0) {
-        errorBox.textContent = 'Пожалуйста, заполните обязательные поля: МНН и дозировка (> 0).';
-        errorBox.style.display = 'block';
-        resultsDiv.style.display = 'block';
-        document.getElementById('resPK').style.display = 'none';
-        document.getElementById('resDesign').style.display = 'none';
-        document.getElementById('resSample').style.display = 'none';
-        document.getElementById('resIssues').style.display = 'none';
-        document.getElementById('resSynopsis').style.display = 'none';
+        errorText.textContent = 'Пожалуйста, заполните обязательные поля: МНН и дозировка (> 0).';
+        errorBox.style.display = 'flex';
+        hideResultCards();
         return;
     }
 
@@ -452,95 +1435,144 @@ document.getElementById('studyForm').addEventListener('submit', async function(e
 
         if (!resp.ok) {
             const err = await resp.json().catch(() => ({}));
-            throw new Error(err.detail || `Ошибка сервера: ${resp.status}`);
+            throw new Error(err.detail || 'Ошибка сервера: ' + resp.status);
         }
 
         const data = await resp.json();
-        renderResults(data);
+        renderResults(data, payload);
 
     } catch (err) {
-        errorBox.textContent = 'Ошибка: ' + err.message;
-        errorBox.style.display = 'block';
-        resultsDiv.style.display = 'block';
-        document.getElementById('resPK').style.display = 'none';
-        document.getElementById('resDesign').style.display = 'none';
-        document.getElementById('resSample').style.display = 'none';
-        document.getElementById('resIssues').style.display = 'none';
-        document.getElementById('resSynopsis').style.display = 'none';
+        errorText.textContent = 'Ошибка: ' + err.message;
+        errorBox.style.display = 'flex';
+        hideResultCards();
     } finally {
         btn.disabled = false;
         spinner.style.display = 'none';
-        btnText.textContent = 'Рассчитать план исследования';
+        btnText.textContent = '🚀 Рассчитать план исследования';
     }
 });
 
-function renderResults(data) {
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.style.display = 'block';
+function hideResultCards() {
+    const results = document.getElementById('results');
+    results.classList.add('visible');
+    document.getElementById('resultsHeader').style.display = 'none';
+    document.getElementById('summaryStrip').style.display = 'none';
+    document.getElementById('resPK').style.display = 'none';
+    document.getElementById('resDesign').style.display = 'none';
+    document.getElementById('resSample').style.display = 'none';
+    document.getElementById('resIssues').style.display = 'none';
+    document.getElementById('resSynopsis').style.display = 'none';
+}
+
+function renderResults(data, payload) {
+    const results = document.getElementById('results');
+    results.classList.add('visible');
     document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('resultsHeader').style.display = '';
+    document.getElementById('summaryStrip').style.display = '';
     document.getElementById('resPK').style.display = '';
     document.getElementById('resDesign').style.display = '';
     document.getElementById('resSample').style.display = '';
     document.getElementById('resIssues').style.display = '';
     document.getElementById('resSynopsis').style.display = '';
 
-    // PK table
+    // Remove collapsed state
+    document.querySelectorAll('.result-card').forEach(c => c.classList.remove('collapsed'));
+
+    // ── Summary strip ──
+    const issueCount = data.issues.length;
+    const issueColor = issueCount === 0 ? 'success' : (data.issues.some(i => i.severity === 'error') ? 'error' : 'warning');
+    document.getElementById('summaryStrip').innerHTML = [
+        { icon: '🧪', value: payload.inn, label: 'Препарат' },
+        { icon: '🔬', value: data.design.type, label: 'Дизайн' },
+        { icon: '👥', value: data.sample_size.adjusted_for_dropout, label: 'Добровольцев' },
+        { icon: issueCount === 0 ? '✅' : '⚠️', value: issueCount === 0 ? 'Нет' : issueCount, label: 'Замечания' },
+    ].map(c => `
+        <div class="summary-card">
+            <div class="sc-icon">${c.icon}</div>
+            <div class="sc-value">${c.value}</div>
+            <div class="sc-label">${c.label}</div>
+        </div>
+    `).join('');
+
+    // ── PK table ──
     const pk = data.pk;
     const pkRows = [
-        ['Cmax (нг/мл)', pk.cmax],
-        ['AUC (нг·ч/мл)', pk.auc],
-        ['Tmax (ч)', pk.tmax],
-        ['T½ (ч)', pk.t_half],
-        ['CVintra', pk.cv_intra],
+        ['Cmax', pk.cmax, 'нг/мл'],
+        ['AUC', pk.auc, 'нг·ч/мл'],
+        ['Tmax', pk.tmax, 'ч'],
+        ['T½', pk.t_half, 'ч'],
+        ['CVintra', pk.cv_intra, ''],
     ];
-    document.getElementById('pkBody').innerHTML = pkRows.map(([p, v]) =>
-        `<tr><td>${p}</td><td>${v != null ? v : '—'}</td></tr>`
+    document.getElementById('pkBody').innerHTML = pkRows.map(([p, v, u]) =>
+        '<tr><td><strong>' + p + '</strong>' + (u ? ' <span style="color:var(--text-muted);font-size:0.8rem">(' + u + ')</span>' : '') + '</td>' +
+        '<td>' + (v != null ? v : '<span style="color:var(--text-muted)">—</span>') + '</td></tr>'
     ).join('');
 
-    // Design
+    // ── Design ──
     const d = data.design;
-    document.getElementById('designDetails').innerHTML = `
-        <table class="pk-table">
-            <tr><th>Название</th><td>${d.name}</td></tr>
-            <tr><th>Тип</th><td>${d.type}</td></tr>
-            <tr><th>Периоды</th><td>${d.periods}</td></tr>
-            <tr><th>Последовательности</th><td>${d.sequences.join(', ')}</td></tr>
-            <tr><th>Wash-out (дни)</th><td>${d.washout_days}</td></tr>
-            <tr><th>RSABE</th><td>${d.rsabe_applicable ? 'Да' : 'Нет'}</td></tr>
-        </table>
-    `;
+    document.getElementById('designDetails').innerHTML =
+        '<table class="data-table">' +
+        '<tr><td><strong>Название</strong></td><td>' + d.name + '</td></tr>' +
+        '<tr><td><strong>Тип</strong></td><td><span class="tag tag-info">' + d.type + '</span></td></tr>' +
+        '<tr><td><strong>Периоды</strong></td><td>' + d.periods + '</td></tr>' +
+        '<tr><td><strong>Последовательности</strong></td><td>' + d.sequences.map(function(s){ return '<span class="tag tag-info">' + s + '</span>'; }).join(' ') + '</td></tr>' +
+        '<tr><td><strong>Wash-out</strong></td><td>' + d.washout_days + ' дней</td></tr>' +
+        '<tr><td><strong>RSABE</strong></td><td>' + (d.rsabe_applicable
+            ? '<span class="tag tag-success">✓ Да</span>'
+            : '<span class="tag" style="background:#f1f5f9;color:var(--text-muted)">Нет</span>') + '</td></tr>' +
+        '</table>';
 
-    // Sample size
+    // ── Sample size ──
     const s = data.sample_size;
-    document.getElementById('sampleDetails').innerHTML = `
-        <table class="pk-table">
-            <tr><th>Базовый N</th><td>${s.base_n}</td></tr>
-            <tr><th>N с учётом потерь</th><td>${s.adjusted_for_dropout}</td></tr>
-            <tr><th>Drop-out rate</th><td>${(s.dropout_rate * 100).toFixed(0)}%</td></tr>
-            <tr><th>Screen-fail rate</th><td>${(s.screen_fail_rate * 100).toFixed(0)}%</td></tr>
-        </table>
-    `;
+    document.getElementById('sampleDetails').innerHTML =
+        '<table class="data-table">' +
+        '<tr><td><strong>Базовый N</strong></td><td>' + s.base_n + '</td></tr>' +
+        '<tr><td><strong>N с учётом потерь</strong></td><td><strong style="color:var(--primary);font-size:1.1rem">' + s.adjusted_for_dropout + '</strong></td></tr>' +
+        '<tr><td><strong>Drop-out rate</strong></td><td>' + (s.dropout_rate * 100).toFixed(0) + '%</td></tr>' +
+        '<tr><td><strong>Screen-fail rate</strong></td><td>' + (s.screen_fail_rate * 100).toFixed(0) + '%</td></tr>' +
+        '</table>';
 
-    // Issues
+    // ── Issues ──
     const issuesDiv = document.getElementById('issuesList');
     if (data.issues.length === 0) {
-        issuesDiv.innerHTML = '<p class="no-issues">✅ Замечаний нет.</p>';
+        issuesDiv.innerHTML = '<div class="no-issues">✅ Регуляторных замечаний нет — всё в порядке!</div>';
     } else {
-        issuesDiv.innerHTML = data.issues.map(iss => {
-            const tagClass = 'tag-' + iss.severity;
-            return `<div class="issue-item ${iss.severity}">
-                <span class="tag ${tagClass}">${iss.severity.toUpperCase()}</span>
-                <strong>[${iss.code}]</strong> ${iss.message}
-            </div>`;
+        issuesDiv.innerHTML = data.issues.map(function(iss) {
+            var icon = iss.severity === 'error' ? '🛑' : (iss.severity === 'warning' ? '⚠️' : 'ℹ️');
+            return '<div class="issue-item ' + iss.severity + '">' +
+                '<span style="font-size:1.2rem;flex-shrink:0">' + icon + '</span>' +
+                '<div class="issue-text"><span class="tag tag-' + iss.severity + '">' + iss.severity.toUpperCase() + '</span> ' +
+                '<strong>[' + iss.code + ']</strong> ' + iss.message + '</div></div>';
         }).join('');
     }
 
-    // Synopsis
+    // ── Synopsis ──
     document.getElementById('synopsisContent').textContent = data.synopsis_md;
 
     // Scroll to results
-    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+/* ═══════════════════════════════════════════════════
+   INPUT INTERACTION ENHANCEMENTS
+   ═══════════════════════════════════════════════════ */
+// Clear error state on input
+document.querySelectorAll('.form-input').forEach(function(input) {
+    input.addEventListener('input', function() {
+        this.classList.remove('error');
+    });
+});
+
+// Keyboard navigation: Enter goes to next step
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA') {
+        if (currentStep < totalSteps) {
+            e.preventDefault();
+            nextStep();
+        }
+    }
+});
 </script>
 
 </body>
