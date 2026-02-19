@@ -181,7 +181,7 @@ def generate_llm_synopsis(
 
 def enhance_synopsis_with_llm(
     base_synopsis: str,
-    api_key: Optional[str] = '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',
+    api_key: Optional[str] = None,
     model: str = "gpt-4",
 ) -> str:
     """
