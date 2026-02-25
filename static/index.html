@@ -6,335 +6,639 @@
     <title>Ifarma BE Study Planner</title>
     <style>
         :root {
-            --primary: #ff7a18;
-            --primary-dark: #a445b2;
-            --accent: #ff3cac;
-            --bg: #0f0b1f;
-            --card-bg: rgba(24, 18, 45, 0.82);
-            --text: #f7ecff;
-            --text-secondary: #ccb9e3;
-            --border: #4d3b66;
-            --success: #35d07f;
-            --warning: #ffb84d;
-            --error: #ff7a88;
-            --info: #b191ff;
-            --input-bg: rgba(18, 13, 36, 0.86);
-            --btn-grad-1: #8e2de2;
-            --btn-grad-2: #ff512f;
-            --btn-grad-3: #dd2476;
+            --bg-deep: #030810;
+            --bg: #060d1a;
+            --bg-card: rgba(6, 14, 28, 0.88);
+            --bg-input: rgba(4, 10, 22, 0.9);
+            --cyan: #00d4ff;
+            --cyan-dim: rgba(0, 212, 255, 0.15);
+            --purple: #7b2fff;
+            --purple-dim: rgba(123, 47, 255, 0.15);
+            --green: #00ff88;
+            --green-dim: rgba(0, 255, 136, 0.12);
+            --red: #ff2255;
+            --red-dim: rgba(255, 34, 85, 0.12);
+            --amber: #ffb800;
+            --amber-dim: rgba(255, 184, 0, 0.12);
+            --text: #e8f0fe;
+            --text-secondary: #7a8fb5;
+            --border: rgba(0, 212, 255, 0.18);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(120deg, #140a27, #1f0f35, #2a143a, #140a27);
-            background-size: 300% 300%;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-deep);
             color: var(--text);
-            line-height: 1.55;
             min-height: 100vh;
-            position: relative;
             overflow-x: hidden;
+            position: relative;
+            line-height: 1.55;
         }
-        body::before, body::after {
-            content: "";
+        /* Neural canvas */
+        #neuralCanvas {
             position: fixed;
-            z-index: -1;
-            width: 340px;
-            height: 340px;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.35;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
             pointer-events: none;
         }
+        /* Ambient blobs */
+        .ambient-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.11;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .ambient-blob-1 {
+            width: 640px; height: 640px;
+            background: radial-gradient(circle, #7b2fff, transparent);
+            top: -220px; left: -160px;
+        }
+        .ambient-blob-2 {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, #00d4ff, transparent);
+            bottom: -160px; right: -110px;
+        }
+        .ambient-blob-3 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, #00ff88, transparent);
+            top: 42%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        /* Scanline texture */
         body::before {
-            background: #ff5f6d;
-            top: -80px;
-            left: -120px;
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 212, 255, 0.007) 2px,
+                rgba(0, 212, 255, 0.007) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
         }
-        body::after {
-            background: #7f5dff;
-            right: -90px;
-            bottom: -120px;
+        /* Moving scan line */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0,212,255,0.5), transparent);
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.35;
         }
+        /* Header */
         header {
-            background: linear-gradient(130deg, #2d163d 0%, var(--primary-dark) 42%, var(--primary) 100%);
-            color: #fff;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(7, 3, 17, 0.6);
-            border-bottom-left-radius: 26px;
-            border-bottom-right-radius: 26px;
+            position: relative;
+            z-index: 10;
+            padding: 36px 40px 30px;
+            background: linear-gradient(180deg, rgba(0,212,255,0.05) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(0,212,255,0.12);
         }
-        header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.2px; }
-        header p { opacity: 0.9; font-size: 1rem; margin-top: 8px; max-width: 760px; }
-        .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 36px; position: relative; z-index: 1; }
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px 4px 6px;
+            background: rgba(0, 212, 255, 0.07);
+            border: 1px solid rgba(0, 212, 255, 0.22);
+            border-radius: 999px;
+            font-size: 0.71rem;
+            font-weight: 600;
+            color: var(--cyan);
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .header-badge .live-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green), 0 0 16px rgba(0,255,136,0.6);
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        header p {
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            max-width: 680px;
+        }
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 28px 20px 52px;
+            position: relative;
+            z-index: 10;
+        }
+        /* Step indicators */
         .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 18px;
+            gap: 12px;
+            margin-bottom: 24px;
             list-style: none;
             padding-left: 0;
         }
         .step {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
             border-radius: 12px;
-            padding: 10px 12px;
-            color: #f2d8ff;
-            font-size: 0.84rem;
+            padding: 12px 14px;
+            color: var(--text-secondary);
+            font-size: 0.81rem;
             font-weight: 600;
+            letter-spacing: 0.4px;
             text-align: center;
-            letter-spacing: 0.2px;
+            overflow: hidden;
+            transition: border-color 0.3s, color 0.3s, box-shadow 0.3s;
         }
+        .step::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.55s ease;
+        }
+        .step:hover::before { left: 160%; }
         .step-current {
-            background: linear-gradient(120deg, rgba(255,122,24,0.22), rgba(164,69,178,0.2));
-            border-color: rgba(255, 122, 24, 0.4);
-            box-shadow: 0 0 0 1px rgba(255, 122, 24, 0.28), 0 0 20px rgba(255, 60, 172, 0.25);
+            background: rgba(0,212,255,0.06);
+            border-color: rgba(0,212,255,0.28);
+            color: var(--cyan);
+            box-shadow: 0 0 24px rgba(0,212,255,0.09), inset 0 0 20px rgba(0,212,255,0.04);
         }
+        /* Cards */
         .card {
-            background: var(--card-bg);
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.13);
-            box-shadow: 0 14px 34px rgba(8, 4, 20, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 26px 28px;
-            margin-bottom: 18px;
-            transition: transform 0.22s ease, box-shadow 0.22s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 30px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(22px);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
+            opacity: 0;
+            transition: opacity 0.35s ease;
         }
         .card:hover {
+            border-color: rgba(0,212,255,0.32);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 60px rgba(0,212,255,0.05);
             transform: translateY(-2px);
-            box-shadow: 0 18px 42px rgba(8, 4, 20, 0.62);
+        }
+        .card:hover::before { opacity: 1; }
+        /* Card header with dot */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .section-dot {
+            position: relative;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .section-dot::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            animation: dotPulse 2.4s ease-in-out infinite;
+        }
+        .dot-cyan  { background: var(--cyan);   box-shadow: 0 0 10px var(--cyan),  0 0 22px rgba(0,212,255,0.5); }
+        .dot-cyan::after  { background: var(--cyan); }
+        .dot-purple{ background: var(--purple); box-shadow: 0 0 10px var(--purple),0 0 22px rgba(123,47,255,0.5); }
+        .dot-purple::after{ background: var(--purple); }
+        .dot-green { background: var(--green);  box-shadow: 0 0 10px var(--green), 0 0 22px rgba(0,255,136,0.5); }
+        .dot-green::after { background: var(--green); }
+        .dot-amber { background: var(--amber);  box-shadow: 0 0 10px var(--amber), 0 0 22px rgba(255,184,0,0.5); }
+        .dot-amber::after { background: var(--amber); }
+        .dot-red   { background: var(--red);    box-shadow: 0 0 10px var(--red),   0 0 22px rgba(255,34,85,0.5); }
+        .dot-red::after   { background: var(--red); }
+        @keyframes dotPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.55; }
+            50%       { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
         }
         .card h2 {
-            font-size: 1.08rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: #ffdcb3;
-            margin-bottom: 6px;
+            color: var(--text);
+            letter-spacing: 0.15px;
         }
         .section-lead {
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 18px;
+            font-size: 0.87rem;
+            margin-bottom: 20px;
+            padding-left: 23px;
         }
+        /* Form grid */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px 18px;
+            gap: 16px 20px;
         }
         .form-group { display: flex; flex-direction: column; }
         label {
-            font-size: 0.8rem;
+            font-size: 0.74rem;
             font-weight: 600;
-            color: var(--text);
-            margin-bottom: 6px;
+            color: var(--text-secondary);
+            margin-bottom: 7px;
             text-transform: uppercase;
-            letter-spacing: 0.35px;
+            letter-spacing: 0.6px;
         }
         label .hint {
-            font-weight: 500;
-            font-size: 0.75rem;
-            color: var(--text);
+            font-weight: 400;
+            font-size: 0.71rem;
+            color: rgba(122,143,181,0.65);
             text-transform: none;
             letter-spacing: 0;
         }
+        /* Inputs */
         input, select {
-            padding: 12px 13px;
-            border: 1px solid var(--border);
+            padding: 11px 14px;
+            border: 1px solid rgba(255,255,255,0.09);
             border-radius: 10px;
-            font-size: 0.95rem;
-            background: var(--input-bg);
-            transition: border-color 0.2s, box-shadow 0.2s, transform 0.16s;
+            font-size: 0.92rem;
+            background: var(--bg-input);
             color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
         }
-        input::placeholder { color: var(--text); opacity: 0.62; }
+        input::placeholder { color: rgba(122,143,181,0.45); }
+        input:hover, select:hover { border-color: rgba(0,212,255,0.22); }
         input:focus, select:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.32), 0 0 18px rgba(255, 60, 172, 0.24);
-            outline: 2px solid var(--accent);
-            outline-offset: 1px;
-            transform: translateY(-1px);
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.11), 0 0 24px rgba(0,212,255,0.07);
+            background: rgba(0,212,255,0.03);
+        }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2300d4ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+            padding-right: 34px;
         }
         input[type="number"] { -moz-appearance: textfield; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-            -webkit-appearance: none; margin: 0;
-        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        /* Checkbox */
         .checkbox-group {
             flex-direction: row;
             align-items: center;
-            gap: 10px;
-            padding-top: 24px;
+            gap: 11px;
+            padding-top: 22px;
         }
         .checkbox-group input[type="checkbox"] {
-            width: 18px; height: 18px; accent-color: var(--primary);
+            width: 17px; height: 17px;
+            accent-color: var(--cyan);
+            cursor: pointer;
         }
         .checkbox-group label {
             margin-bottom: 0;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             color: var(--text);
             text-transform: none;
             letter-spacing: 0;
+            font-weight: 500;
+            cursor: pointer;
         }
-        .btn-row { text-align: center; margin-top: 2px; }
+        /* Drug chips */
+        .drug-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 9px;
+        }
+        .drug-chip {
+            padding: 3px 11px;
+            border: 1px solid rgba(0,212,255,0.18);
+            border-radius: 999px;
+            font-size: 0.73rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: rgba(0,212,255,0.03);
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+        .drug-chip:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0,212,255,0.09);
+            box-shadow: 0 0 12px rgba(0,212,255,0.14);
+        }
+        /* Submit button */
+        .btn-row { text-align: center; margin-top: 6px; }
         .btn-submit {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: linear-gradient(120deg, var(--btn-grad-1), var(--btn-grad-2), var(--btn-grad-3));
-            background-size: 220% 220%;
-            color: #fff;
-            border: none;
+            gap: 12px;
+            padding: 14px 46px;
+            background: transparent;
+            border: 1px solid rgba(0,212,255,0.38);
             border-radius: 12px;
-            padding: 13px 38px;
-            font-size: 1rem;
+            color: var(--text);
+            font-size: 0.96rem;
             font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            box-shadow: 0 14px 26px rgba(103, 43, 123, 0.44);
-            transition: transform 0.14s, box-shadow 0.2s, filter 0.2s;
-            position: relative;
             overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s, color 0.25s;
+            letter-spacing: 0.3px;
+        }
+        .btn-submit::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(123,47,255,0.1) 100%);
+            transition: opacity 0.3s;
         }
         .btn-submit::after {
             content: "";
             position: absolute;
-            top: -150%;
-            left: -35%;
-            width: 30%;
-            height: 400%;
-            background: rgba(255, 255, 255, 0.24);
+            top: -150%; left: -40%;
+            width: 40%; height: 400%;
+            background: rgba(255,255,255,0.13);
             transform: rotate(25deg);
             pointer-events: none;
         }
-        .btn-submit:hover { transform: translateY(-1px); filter: brightness(1.06); }
-        .btn-submit:active { transform: scale(0.99); }
-        .btn-submit:disabled {
-            background: linear-gradient(120deg, #665979, #827297);
-            box-shadow: none;
-            cursor: not-allowed;
+        .btn-submit:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0,212,255,0.22), 0 0 60px rgba(0,212,255,0.08), inset 0 0 30px rgba(0,212,255,0.05);
+            transform: translateY(-2px);
+            color: #fff;
         }
+        .btn-submit:active { transform: scale(0.98) translateY(0); }
+        .btn-submit:disabled {
+            border-color: rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-icon {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+            flex-shrink: 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-submit:hover .btn-icon {
+            transform: scale(1.25);
+            box-shadow: 0 0 16px var(--cyan), 0 0 30px rgba(0,212,255,0.4);
+        }
+        /* Spinner */
         .spinner {
             display: none;
-            width: 20px; height: 20px;
-            border: 3px solid rgba(255,255,255,0.32);
-            border-top-color: #fff;
+            width: 17px; height: 17px;
+            border: 2px solid rgba(0,212,255,0.2);
+            border-top-color: var(--cyan);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #results { display: none; margin-top: 20px; }
-        .result-section { margin-bottom: 14px; }
+        /* Results */
+        #results { display: none; margin-top: 24px; }
+        .result-section { margin-bottom: 16px; }
+        /* Tables */
         table.pk-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
         table.pk-table th, table.pk-table td {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.07);
             text-align: left;
         }
         table.pk-table th {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(0,212,255,0.04);
             font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
         }
+        table.pk-table tr { transition: background 0.2s ease; }
+        table.pk-table tbody tr:hover { background: rgba(0,212,255,0.04); }
+        table.pk-table td:last-child {
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.84rem;
+        }
+        .val-yes { color: var(--green) !important; font-weight: 600; }
+        .val-no  { color: var(--red)   !important; opacity: 0.75; }
+        /* Tags */
         .tag {
-            display: inline-block;
-            padding: 3px 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px 2px 5px;
             border-radius: 999px;
-            font-size: 0.76rem;
+            font-size: 0.71rem;
             font-weight: 700;
             margin-right: 6px;
+            letter-spacing: 0.4px;
         }
-        .tag-info { background: rgba(177, 145, 255, 0.2); color: #ceb5ff; }
-        .tag-warning { background: rgba(255, 184, 77, 0.18); color: #ffd39a; }
-        .tag-error { background: rgba(255, 122, 136, 0.18); color: #ffb5bd; }
+        .tag::before {
+            content: "";
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .tag-info    { background: rgba(0,212,255,0.1);  color: var(--cyan);   border: 1px solid rgba(0,212,255,0.22); }
+        .tag-info::before    { background: var(--cyan);   box-shadow: 0 0 4px var(--cyan); }
+        .tag-warning { background: rgba(255,184,0,0.1);  color: var(--amber);  border: 1px solid rgba(255,184,0,0.22); }
+        .tag-warning::before { background: var(--amber);  box-shadow: 0 0 4px var(--amber); }
+        .tag-error   { background: rgba(255,34,85,0.1);  color: var(--red);    border: 1px solid rgba(255,34,85,0.22); }
+        .tag-error::before   { background: var(--red);    box-shadow: 0 0 4px var(--red); }
+        /* Issue items */
         .issue-item {
-            padding: 10px 12px;
-            margin-bottom: 7px;
-            border-radius: 8px;
-            border-left: 4px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
-            font-size: 0.9rem;
-        }
-        .issue-item.info { border-left-color: var(--info); }
-        .issue-item.warning { border-left-color: var(--warning); }
-        .issue-item.error { border-left-color: var(--error); }
-        .synopsis-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border);
+            position: relative;
+            padding: 12px 14px;
+            margin-bottom: 8px;
             border-radius: 10px;
-            padding: 16px 18px;
+            border-left: 3px solid;
             font-size: 0.88rem;
-            line-height: 1.65;
+            transition: background 0.25s ease;
+        }
+        .issue-item.info    { border-left-color: var(--cyan);   background: rgba(0,212,255,0.04); }
+        .issue-item.warning { border-left-color: var(--amber);  background: rgba(255,184,0,0.04); }
+        .issue-item.error   { border-left-color: var(--red);    background: rgba(255,34,85,0.05); }
+        .issue-item:hover   { filter: brightness(1.15); }
+        /* Synopsis */
+        .synopsis-box {
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 18px 20px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            line-height: 1.72;
             white-space: pre-wrap;
             max-height: 600px;
             overflow-y: auto;
+            color: rgba(232,240,254,0.82);
         }
+        .synopsis-box::-webkit-scrollbar { width: 4px; }
+        .synopsis-box::-webkit-scrollbar-track { background: transparent; }
+        .synopsis-box::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.28); border-radius: 2px; }
+        /* Error box */
         .error-box {
-            background: rgba(255, 122, 136, 0.15);
-            border: 1px solid var(--error);
+            background: rgba(255,34,85,0.08);
+            border: 1px solid rgba(255,34,85,0.28);
             border-radius: 10px;
             padding: 14px 18px;
-            color: var(--error);
-            font-size: 0.92rem;
+            color: var(--red);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .no-issues { color: var(--success); font-weight: 600; }
-        @keyframes bgShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .error-box::before {
+            content: "";
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red), 0 0 16px rgba(255,34,85,0.5);
+            flex-shrink: 0;
+            animation: dotPulse 1.5s ease-in-out infinite;
         }
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(24px, -18px); }
+        /* No issues */
+        .no-issues {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--green);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 6px 0;
         }
+        .no-issues::before {
+            content: "";
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green), 0 0 16px rgba(0,255,136,0.5);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+        /* Animations */
         @keyframes riseIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes shine {
-            0%, 25% { left: -35%; }
-            55%, 100% { left: 125%; }
+        @keyframes scanMove {
+            0%   { transform: translateY(-100vh); }
+            100% { transform: translateY(200vh); }
         }
+        @keyframes shimmer {
+            0%, 20% { left: -40%; }
+            65%, 100% { left: 135%; }
+        }
+        @keyframes blobDrift1 {
+            0%, 100% { transform: translate(0, 0); }
+            33%  { transform: translate(45px, 35px); }
+            66%  { transform: translate(-22px, 55px); }
+        }
+        @keyframes blobDrift2 {
+            0%, 100% { transform: translate(0, 0); }
+            33%  { transform: translate(-55px, -28px); }
+            66%  { transform: translate(32px, -52px); }
+        }
+        @keyframes blobDrift3 {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50%  { transform: translate(-50%, -62%); }
+        }
+        /* Responsive */
         @media (max-width: 760px) {
             .steps { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
-            .card { padding: 18px 16px; }
-            header { padding: 20px 16px; border-radius: 0 0 20px 20px; }
-            header h1 { font-size: 1.42rem; }
+            .card { padding: 20px 18px; }
+            header { padding: 24px 20px; }
+            header h1 { font-size: 1.6rem; }
         }
+        /* Motion */
         @media (prefers-reduced-motion: no-preference) {
-            body { animation: bgShift 16s ease infinite; }
-            body::before, body::after { animation: drift 14s ease-in-out infinite; }
-            body::after { animation-delay: 4s; }
-            .step { animation: riseIn 0.6s ease both; }
-            .step:nth-child(2) { animation-delay: 0.08s; }
-            .step:nth-child(3) { animation-delay: 0.16s; }
-            .card { animation: riseIn 0.55s ease both; }
-            .btn-submit { animation: bgShift 8s ease infinite; }
-            .btn-submit::after { animation: shine 3.2s ease-in-out infinite; }
+            .step  { animation: riseIn 0.5s ease both; }
+            .step:nth-child(2) { animation-delay: 0.07s; }
+            .step:nth-child(3) { animation-delay: 0.14s; }
+            .card  { animation: riseIn 0.5s ease both; }
+            .card:nth-child(2) { animation-delay: 0.06s; }
+            .card:nth-child(3) { animation-delay: 0.12s; }
+            .btn-submit::after { animation: shimmer 3.2s ease-in-out infinite; }
+            .ambient-blob-1 { animation: blobDrift1 20s ease-in-out infinite; }
+            .ambient-blob-2 { animation: blobDrift2 24s ease-in-out infinite; }
+            .ambient-blob-3 { animation: blobDrift3 28s ease-in-out infinite; }
+            .scan-line { animation: scanMove 6s linear infinite; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation: none !important;
                 transition-duration: 0.01ms !important;
-                transition-delay: 0ms !important;
             }
-            .btn-submit::after { display: none; }
         }
     </style>
 </head>
 <body>
 
+<div class="scan-line"></div>
+<div class="ambient-blob ambient-blob-1"></div>
+<div class="ambient-blob ambient-blob-2"></div>
+<div class="ambient-blob ambient-blob-3"></div>
+<canvas id="neuralCanvas"></canvas>
+
 <header>
-    <h1>💊 Ifarma BE Study Planner</h1>
-    <p>Планирование исследований биоэквивалентности — ввод параметров</p>
+    <div class="header-badge">
+        <span class="live-dot"></span>
+        СИСТЕМА АКТИВНА
+    </div>
+    <h1>Ifarma BE Study Planner</h1>
+    <p>Интеллектуальная система планирования исследований биоэквивалентности</p>
 </header>
 
 <div class="container">
     <ol class="steps" aria-label="Шаги заполнения формы">
-        <li class="step step-current" aria-current="step">Шаг 1 · Препарат</li>
-        <li class="step">Шаг 2 · Дизайн и вариабельность</li>
-        <li class="step">Шаг 3 · Популяция</li>
+        <li class="step step-current" aria-current="step">ШАГ 01 &nbsp;·&nbsp; ПРЕПАРАТ</li>
+        <li class="step">ШАГ 02 &nbsp;·&nbsp; ДИЗАЙН И ВАРИАБЕЛЬНОСТЬ</li>
+        <li class="step">ШАГ 03 &nbsp;·&nbsp; ПОПУЛЯЦИЯ</li>
     </ol>
 
     <!-- ═══════════ FORM ═══════════ -->
@@ -342,16 +646,25 @@
 
         <!-- Drug Information -->
         <div class="card">
-            <h2>🧪 Информация о препарате</h2>
+            <div class="card-header">
+                <span class="section-dot dot-cyan"></span>
+                <h2>Информация о препарате</h2>
+            </div>
             <p class="section-lead">Укажите ключевые свойства тестируемого фармпрепарата и режим его приёма.</p>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="inn">МНН (INN) действующего вещества <span class="hint">*</span></label>
+                    <label for="inn">МНН (INN) действующего вещества <span class="hint">* обязательно</span></label>
                     <input type="text" id="inn" name="inn" required
                            placeholder="напр. омепразол" autocomplete="off">
+                    <div class="drug-chips">
+                        <button type="button" class="drug-chip" onclick="document.getElementById('inn').value='омепразол'">омепразол</button>
+                        <button type="button" class="drug-chip" onclick="document.getElementById('inn').value='метформин'">метформин</button>
+                        <button type="button" class="drug-chip" onclick="document.getElementById('inn').value='амоксициллин'">амоксициллин</button>
+                        <button type="button" class="drug-chip" onclick="document.getElementById('inn').value='аторвастатин'">аторвастатин</button>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="dose_mg">Дозировка, мг <span class="hint">*</span></label>
+                    <label for="dose_mg">Дозировка, мг <span class="hint">* обязательно</span></label>
                     <input type="number" id="dose_mg" name="dose_mg" required
                            min="0.01" step="any" placeholder="напр. 20">
                 </div>
@@ -377,7 +690,10 @@
 
         <!-- Variability / Design -->
         <div class="card">
-            <h2>📊 Вариабельность и дизайн</h2>
+            <div class="card-header">
+                <span class="section-dot dot-purple"></span>
+                <h2>Вариабельность и дизайн</h2>
+            </div>
             <p class="section-lead">Выберите параметры вариабельности и предпочтения по протоколу исследования.</p>
             <div class="form-grid">
                 <div class="form-group">
@@ -414,7 +730,10 @@
 
         <!-- Population -->
         <div class="card">
-            <h2>👥 Параметры популяции добровольцев</h2>
+            <div class="card-header">
+                <span class="section-dot dot-green"></span>
+                <h2>Параметры популяции добровольцев</h2>
+            </div>
             <p class="section-lead">Определите критерии включения для возраста, пола и ИМТ участников.</p>
             <div class="form-grid">
                 <div class="form-group">
@@ -453,6 +772,7 @@
 
         <div class="btn-row">
             <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="btn-icon" id="btnIcon"></span>
                 <span id="btnText">Рассчитать план исследования</span>
                 <span class="spinner" id="spinner"></span>
             </button>
@@ -467,36 +787,49 @@
 
         <!-- PK Parameters -->
         <div class="card result-section" id="resPK">
-            <h2>📈 Фармакокинетические параметры</h2>
+            <div class="card-header">
+                <span class="section-dot dot-cyan"></span>
+                <h2>Фармакокинетические параметры</h2>
+            </div>
             <table class="pk-table">
-                <thead>
-                    <tr><th>Параметр</th><th>Значение</th></tr>
-                </thead>
+                <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
                 <tbody id="pkBody"></tbody>
             </table>
         </div>
 
         <!-- Design -->
         <div class="card result-section" id="resDesign">
-            <h2>🔬 Выбранный дизайн исследования</h2>
+            <div class="card-header">
+                <span class="section-dot dot-purple"></span>
+                <h2>Выбранный дизайн исследования</h2>
+            </div>
             <div id="designDetails"></div>
         </div>
 
         <!-- Sample Size -->
         <div class="card result-section" id="resSample">
-            <h2>🔢 Размер выборки</h2>
+            <div class="card-header">
+                <span class="section-dot dot-amber"></span>
+                <h2>Размер выборки</h2>
+            </div>
             <div id="sampleDetails"></div>
         </div>
 
         <!-- Regulatory Issues -->
         <div class="card result-section" id="resIssues">
-            <h2>⚠️ Регуляторные замечания</h2>
+            <div class="card-header">
+                <span class="section-dot dot-amber" id="issuesDot"></span>
+                <h2>Регуляторные замечания</h2>
+            </div>
             <div id="issuesList"></div>
         </div>
 
         <!-- Synopsis -->
         <div class="card result-section" id="resSynopsis">
-            <h2>📝 Синопсис протокола</h2>
+            <div class="card-header">
+                <span class="section-dot dot-cyan"></span>
+                <h2>Синопсис протокола</h2>
+            </div>
             <div class="synopsis-box" id="synopsisContent"></div>
         </div>
     </div>
@@ -504,27 +837,91 @@
 </div>
 
 <script>
-document.getElementById('studyForm').addEventListener('submit', async function(e) {
+/* ── Neural network background ─────────────────────────────────────────── */
+(function () {
+    const canvas = document.getElementById('neuralCanvas');
+    const ctx = canvas.getContext('2d');
+    let nodes = [], W, H;
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const NODE_COUNT = 55, MAX_DIST = 165;
+    for (let i = 0; i < NODE_COUNT; i++) {
+        nodes.push({
+            x: Math.random() * W, y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.28,
+            vy: (Math.random() - 0.5) * 0.28,
+            r: Math.random() * 2 + 1,
+            phase: Math.random() * Math.PI * 2,
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        nodes.forEach(n => {
+            n.x += n.vx; n.y += n.vy; n.phase += 0.018;
+            if (n.x < 0 || n.x > W) n.vx *= -1;
+            if (n.y < 0 || n.y > H) n.vy *= -1;
+        });
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                if (d < MAX_DIST) {
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[i].x, nodes[i].y);
+                    ctx.lineTo(nodes[j].x, nodes[j].y);
+                    ctx.strokeStyle = `rgba(0,212,255,${(1 - d / MAX_DIST) * 0.17})`;
+                    ctx.lineWidth = 0.6;
+                    ctx.stroke();
+                }
+            }
+        }
+        nodes.forEach(n => {
+            const pulse = Math.sin(n.phase) * 0.5 + 0.5;
+            const r = n.r + pulse;
+            const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 4.5);
+            g.addColorStop(0, `rgba(0,212,255,${0.14 * pulse})`);
+            g.addColorStop(1, 'rgba(0,212,255,0)');
+            ctx.beginPath(); ctx.arc(n.x, n.y, r * 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = g; ctx.fill();
+            ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,212,255,${0.55 + 0.45 * pulse})`; ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
+})();
+
+/* ── Form submit ────────────────────────────────────────────────────────── */
+document.getElementById('studyForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const btn = document.getElementById('submitBtn');
-    const spinner = document.getElementById('spinner');
-    const btnText = document.getElementById('btnText');
+    const btn       = document.getElementById('submitBtn');
+    const spinner   = document.getElementById('spinner');
+    const btnText   = document.getElementById('btnText');
+    const btnIcon   = document.getElementById('btnIcon');
     const resultsDiv = document.getElementById('results');
-    const errorBox = document.getElementById('errorBox');
+    const errorBox  = document.getElementById('errorBox');
 
     // Build payload
     const payload = {
-        inn: document.getElementById('inn').value.trim(),
-        dose_mg: parseFloat(document.getElementById('dose_mg').value),
-        form: document.getElementById('form').value,
-        regime: document.getElementById('regime').value,
+        inn:        document.getElementById('inn').value.trim(),
+        dose_mg:    parseFloat(document.getElementById('dose_mg').value),
+        form:       document.getElementById('form').value,
+        regime:     document.getElementById('regime').value,
         study_type: document.getElementById('study_type').value,
-        min_age: parseInt(document.getElementById('min_age').value, 10),
-        max_age: parseInt(document.getElementById('max_age').value, 10),
-        sex: document.getElementById('sex').value,
-        bmi_min: parseFloat(document.getElementById('bmi_min').value),
-        bmi_max: parseFloat(document.getElementById('bmi_max').value),
+        min_age:    parseInt(document.getElementById('min_age').value, 10),
+        max_age:    parseInt(document.getElementById('max_age').value, 10),
+        sex:        document.getElementById('sex').value,
+        bmi_min:    parseFloat(document.getElementById('bmi_min').value),
+        bmi_max:    parseFloat(document.getElementById('bmi_max').value),
     };
 
     // Optional fields
@@ -537,26 +934,22 @@ document.getElementById('studyForm').addEventListener('submit', async function(e
     const prefDesign = document.getElementById('preferred_design').value.trim();
     if (prefDesign !== '') payload.preferred_design = prefDesign;
 
-    if (document.getElementById('need_rsabe').checked) {
-        payload.need_rsabe = true;
-    }
+    if (document.getElementById('need_rsabe').checked) payload.need_rsabe = true;
 
     // Validate required
     if (!payload.inn || isNaN(payload.dose_mg) || payload.dose_mg <= 0) {
         errorBox.textContent = 'Пожалуйста, заполните обязательные поля: МНН и дозировка (> 0).';
-        errorBox.style.display = 'block';
+        errorBox.style.display = 'flex';
         resultsDiv.style.display = 'block';
-        document.getElementById('resPK').style.display = 'none';
-        document.getElementById('resDesign').style.display = 'none';
-        document.getElementById('resSample').style.display = 'none';
-        document.getElementById('resIssues').style.display = 'none';
-        document.getElementById('resSynopsis').style.display = 'none';
+        ['resPK','resDesign','resSample','resIssues','resSynopsis']
+            .forEach(id => document.getElementById(id).style.display = 'none');
         return;
     }
 
     // Show spinner
     btn.disabled = true;
     spinner.style.display = 'inline-block';
+    btnIcon.style.display = 'none';
     btnText.textContent = 'Расчёт…';
     errorBox.style.display = 'none';
 
@@ -566,53 +959,42 @@ document.getElementById('studyForm').addEventListener('submit', async function(e
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
-
         if (!resp.ok) {
             const err = await resp.json().catch(() => ({}));
             throw new Error(err.detail || `Ошибка сервера: ${resp.status}`);
         }
-
-        const data = await resp.json();
-        renderResults(data);
-
+        renderResults(await resp.json());
     } catch (err) {
         errorBox.textContent = 'Ошибка: ' + err.message;
-        errorBox.style.display = 'block';
+        errorBox.style.display = 'flex';
         resultsDiv.style.display = 'block';
-        document.getElementById('resPK').style.display = 'none';
-        document.getElementById('resDesign').style.display = 'none';
-        document.getElementById('resSample').style.display = 'none';
-        document.getElementById('resIssues').style.display = 'none';
-        document.getElementById('resSynopsis').style.display = 'none';
+        ['resPK','resDesign','resSample','resIssues','resSynopsis']
+            .forEach(id => document.getElementById(id).style.display = 'none');
     } finally {
         btn.disabled = false;
         spinner.style.display = 'none';
+        btnIcon.style.display = '';
         btnText.textContent = 'Рассчитать план исследования';
     }
 });
 
+/* ── Render results ─────────────────────────────────────────────────────── */
 function renderResults(data) {
     const resultsDiv = document.getElementById('results');
     resultsDiv.style.display = 'block';
     document.getElementById('errorBox').style.display = 'none';
-    document.getElementById('resPK').style.display = '';
-    document.getElementById('resDesign').style.display = '';
-    document.getElementById('resSample').style.display = '';
-    document.getElementById('resIssues').style.display = '';
-    document.getElementById('resSynopsis').style.display = '';
+    ['resPK','resDesign','resSample','resIssues','resSynopsis']
+        .forEach(id => document.getElementById(id).style.display = '');
 
     // PK table
     const pk = data.pk;
-    const pkRows = [
+    document.getElementById('pkBody').innerHTML = [
         ['Cmax (нг/мл)', pk.cmax],
         ['AUC (нг·ч/мл)', pk.auc],
         ['Tmax (ч)', pk.tmax],
         ['T½ (ч)', pk.t_half],
         ['CVintra', pk.cv_intra],
-    ];
-    document.getElementById('pkBody').innerHTML = pkRows.map(([p, v]) =>
-        `<tr><td>${p}</td><td>${v != null ? v : '—'}</td></tr>`
-    ).join('');
+    ].map(([p, v]) => `<tr><td>${p}</td><td>${v != null ? v : '—'}</td></tr>`).join('');
 
     // Design
     const d = data.design;
@@ -623,9 +1005,8 @@ function renderResults(data) {
             <tr><th>Периоды</th><td>${d.periods}</td></tr>
             <tr><th>Последовательности</th><td>${d.sequences.join(', ')}</td></tr>
             <tr><th>Wash-out (дни)</th><td>${d.washout_days}</td></tr>
-            <tr><th>RSABE</th><td>${d.rsabe_applicable ? 'Да' : 'Нет'}</td></tr>
-        </table>
-    `;
+            <tr><th>RSABE</th><td class="${d.rsabe_applicable ? 'val-yes' : 'val-no'}">${d.rsabe_applicable ? 'Да' : 'Нет'}</td></tr>
+        </table>`;
 
     // Sample size
     const s = data.sample_size;
@@ -635,27 +1016,28 @@ function renderResults(data) {
             <tr><th>N с учётом потерь</th><td>${s.adjusted_for_dropout}</td></tr>
             <tr><th>Drop-out rate</th><td>${(s.dropout_rate * 100).toFixed(0)}%</td></tr>
             <tr><th>Screen-fail rate</th><td>${(s.screen_fail_rate * 100).toFixed(0)}%</td></tr>
-        </table>
-    `;
+        </table>`;
 
     // Issues
     const issuesDiv = document.getElementById('issuesList');
+    const issuesDot = document.getElementById('issuesDot');
     if (data.issues.length === 0) {
-        issuesDiv.innerHTML = '<p class="no-issues">✅ Замечаний нет.</p>';
+        issuesDiv.innerHTML = '<p class="no-issues">Замечаний нет — все проверки пройдены</p>';
+        issuesDot.className = 'section-dot dot-green';
     } else {
-        issuesDiv.innerHTML = data.issues.map(iss => {
-            const tagClass = 'tag-' + iss.severity;
-            return `<div class="issue-item ${iss.severity}">
-                <span class="tag ${tagClass}">${iss.severity.toUpperCase()}</span>
+        const hasError = data.issues.some(i => i.severity === 'error');
+        issuesDot.className = 'section-dot ' + (hasError ? 'dot-red' : 'dot-amber');
+        issuesDiv.innerHTML = data.issues.map(iss =>
+            `<div class="issue-item ${iss.severity}">
+                <span class="tag tag-${iss.severity}">${iss.severity.toUpperCase()}</span>
                 <strong>[${iss.code}]</strong> ${iss.message}
-            </div>`;
-        }).join('');
+            </div>`
+        ).join('');
     }
 
     // Synopsis
     document.getElementById('synopsisContent').textContent = data.synopsis_md;
 
-    // Scroll to results
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 </script>
