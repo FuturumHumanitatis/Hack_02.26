@@ -97,42 +97,94 @@ class LLMDesignResponse(BaseModel):
     error_message: Optional[str] = None
 
 
+class LLMDesignRequest(BaseModel):
+    """Запрос для генерации синопсиса через YandexGPT 5 PRO."""
+
+    # Параметры исследования (те же, что в StudyInput)
+    inn: str
+    dose_mg: float
+    form: str = "tablet"
+    cv_intra: Optional[float] = None
+    cv_category: Optional[str] = None
+    need_rsabe: Optional[bool] = None
+    regime: str = "fasted"
+    study_type: str = "single"
+    preferred_design: Optional[str] = None
+    min_age: int = 18
+    max_age: int = 55
+    sex: str = "both"
+    bmi_min: float = 18.5
+    bmi_max: float = 30.0
+
+    # Учётные данные YandexGPT
+    api_key: Optional[str] = None
+    folder_id: Optional[str] = None
+
+
 @app.post("/design-llm", response_model=LLMDesignResponse)
-def design_llm_endpoint(study_input: StudyInput) -> LLMDesignResponse:
+def design_llm_endpoint(req: LLMDesignRequest) -> LLMDesignResponse:
     """
-    Принимает входные параметры исследования и возвращает результат с 
-    синопсисом, сгенерированным с помощью LLM (GPT-4).
-    
+    Принимает входные параметры исследования и возвращает результат с
+    синопсисом, сгенерированным с помощью YandexGPT 5 PRO.
+
     Если LLM недоступен или происходит ошибка, и LLM_FALLBACK_TO_TEMPLATE=True,
     используется шаблонная генерация.
+
+    Поля api_key и folder_id передаются из UI и имеют приоритет над
+    переменными окружения YANDEX_API_KEY / YANDEX_FOLDER_ID.
     """
+    study_input = StudyInput(
+        inn=req.inn,
+        dose_mg=req.dose_mg,
+        form=req.form,  # type: ignore[arg-type]
+        cv_intra=req.cv_intra,
+        cv_category=req.cv_category,  # type: ignore[arg-type]
+        need_rsabe=req.need_rsabe,
+        regime=req.regime,  # type: ignore[arg-type]
+        study_type=req.study_type,  # type: ignore[arg-type]
+        preferred_design=req.preferred_design,
+        min_age=req.min_age,
+        max_age=req.max_age,
+        sex=req.sex,  # type: ignore[arg-type]
+        bmi_min=req.bmi_min,
+        bmi_max=req.bmi_max,
+    )
     pk = get_pk_parameters(study_input)
     design = select_study_design(study_input, pk)
     sample = calculate_sample_size(study_input, design)
     issues = run_regulatory_checks(study_input, pk, design, sample)
-    
+
     llm_generated = False
     error_message = None
     synopsis = None
-    
+
+    # Определяем ключи: сначала из запроса, затем из окружения
+    effective_api_key = req.api_key or os.getenv("YANDEX_API_KEY")
+    effective_folder_id = req.folder_id or os.getenv("YANDEX_FOLDER_ID")
+
     # Пытаемся сгенерировать синопсис через LLM
     if LLM_ENABLED:
-        try:
-            api_key = os.getenv("OPENAI_API_KEY")
-            if api_key:
+        if effective_api_key and effective_folder_id:
+            try:
                 synopsis = generate_llm_synopsis(
                     study_input, pk, design, sample, issues,
-                    api_key=api_key,
-                    model=LLM_MODEL
+                    api_key=effective_api_key,
+                    folder_id=effective_folder_id,
+                    model=LLM_MODEL,
                 )
                 llm_generated = True
-            else:
-                error_message = "OPENAI_API_KEY не установлен"
-        except Exception as e:
-            error_message = str(e)
+            except Exception as e:
+                error_message = str(e)
+        else:
+            missing = []
+            if not effective_api_key:
+                missing.append("YANDEX_API_KEY")
+            if not effective_folder_id:
+                missing.append("YANDEX_FOLDER_ID")
+            error_message = f"Не указаны: {', '.join(missing)}"
     else:
         error_message = "LLM отключен в конфигурации"
-    
+
     # Fallback к шаблонной генерации
     if synopsis is None:
         if LLM_FALLBACK_TO_TEMPLATE:
@@ -142,7 +194,7 @@ def design_llm_endpoint(study_input: StudyInput) -> LLMDesignResponse:
                 status_code=500,
                 detail=f"Не удалось сгенерировать синопсис через LLM: {error_message}"
             )
-    
+
     return LLMDesignResponse(
         pk=pk,
         design=design,
@@ -426,28 +478,29 @@ def translate_endpoint(req: TranslateRequest) -> TranslateResponse:
     Переводит синопсис на английский язык (или другой целевой язык)
     с сохранением терминологии и форматирования.
     Адаптирует под требования зарубежных регуляторов (EMA / FDA).
+    Использует YandexGPT 5 PRO.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
+    import requests as _req_lib
+    from llm.client import YANDEX_GPT_API_URL, YANDEX_GPT_MODEL_ID
 
-    if not LLM_ENABLED or not api_key:
-        # Возвращаем заглушку с аннотацией
+    api_key = os.getenv("YANDEX_API_KEY")
+    folder_id = os.getenv("YANDEX_FOLDER_ID")
+
+    if not LLM_ENABLED or not api_key or not folder_id:
         translated = (
             f"# [TRANSLATION PLACEHOLDER — LLM not configured]\n\n"
             f"*Original Russian synopsis is shown below. "
-            f"Configure OPENAI_API_KEY to enable automatic translation.*\n\n"
+            f"Configure YANDEX_API_KEY and YANDEX_FOLDER_ID to enable automatic translation.*\n\n"
             f"---\n\n{req.synopsis_md}"
         )
         return TranslateResponse(
             translated_md=translated,
             target_language=req.target_language,
             llm_translated=False,
-            note="LLM не настроен. Установите OPENAI_API_KEY для автоматического перевода.",
+            note="LLM не настроен. Установите YANDEX_API_KEY и YANDEX_FOLDER_ID для автоматического перевода.",
         )
 
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
-
         lang_map = {"en": "English", "de": "German", "fr": "French", "zh": "Chinese"}
         lang_name = lang_map.get(req.target_language, req.target_language)
 
@@ -462,15 +515,28 @@ def translate_endpoint(req: TranslateRequest) -> TranslateResponse:
             f"{req.synopsis_md}"
         )
 
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2,
-            max_tokens=4000,
+        model_uri = f"gpt://{folder_id}/{YANDEX_GPT_MODEL_ID}/latest"
+        resp = _req_lib.post(
+            YANDEX_GPT_API_URL,
+            headers={
+                "Authorization": f"Api-Key {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "modelUri": model_uri,
+                "completionOptions": {
+                    "stream": False,
+                    "temperature": 0.2,
+                    "maxTokens": "4000",
+                },
+                "messages": [{"role": "user", "text": prompt}],
+            },
+            timeout=120,
         )
-        translated = response.choices[0].message.content or req.synopsis_md
+        resp.raise_for_status()
+        translated = resp.json()["result"]["alternatives"][0]["message"]["text"]
         return TranslateResponse(
-            translated_md=translated,
+            translated_md=translated or req.synopsis_md,
             target_language=req.target_language,
             llm_translated=True,
         )

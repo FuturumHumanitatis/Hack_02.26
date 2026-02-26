@@ -637,6 +637,18 @@
         .btn-translate:hover { background: rgba(123,47,255,0.08); box-shadow: 0 0 18px rgba(123,47,255,0.18); }
         .btn-protocol  { color: var(--green);  border-color: rgba(0,255,136,0.35); }
         .btn-protocol:hover  { background: rgba(0,255,136,0.08); box-shadow: 0 0 18px rgba(0,255,136,0.18); }
+        /* ── LLM status badges ──────────────────────────────────────── */
+        .llm-badge-success {
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--purple);
+            font-weight: 600;
+        }
+        .llm-badge-warning {
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--amber);
+        }
         /* ── Case library panel ─────────────────────────────────────── */
         .case-list { display: flex; flex-direction: column; gap: 10px; }
         .case-card {
@@ -915,11 +927,48 @@
             </div>
         </div>
 
-        <div class="btn-row">
+        <!-- YandexGPT API Key -->
+        <div class="card" id="yandexCard">
+            <div class="card-header">
+                <span class="section-dot dot-purple"></span>
+                <h2>YandexGPT 5 PRO — генерация синопсиса</h2>
+            </div>
+            <p class="section-lead">
+                Введите учётные данные Yandex Cloud для генерации расширенного синопсиса
+                с помощью YandexGPT 5 PRO. Ключи используются только в рамках текущего запроса
+                и не сохраняются.
+                <a href="https://yandex.cloud/ru/docs/iam/operations/api-key/create"
+                   target="_blank" rel="noopener noreferrer"
+                   style="color:var(--purple);text-decoration:underline;font-size:0.82rem;">
+                    Как получить ключ&nbsp;↗
+                </a>
+            </p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="yandex_api_key">API-ключ Yandex Cloud</label>
+                    <input type="password" id="yandex_api_key" name="yandex_api_key"
+                           placeholder="AQVN…" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="yandex_folder_id">Идентификатор каталога (Folder ID)</label>
+                    <input type="text" id="yandex_folder_id" name="yandex_folder_id"
+                           placeholder="b1g…" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-row" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
             <button type="submit" class="btn-submit" id="submitBtn">
                 <span class="btn-icon" id="btnIcon"></span>
                 <span id="btnText">Рассчитать план исследования</span>
                 <span class="spinner" id="spinner"></span>
+            </button>
+            <button type="button" class="btn-submit" id="btnYandex"
+                    style="border-color:rgba(123,47,255,0.5);background:rgba(123,47,255,0.07);"
+                    onclick="doYandexGPT()">
+                <span class="btn-icon" style="background:var(--purple);box-shadow:0 0 8px var(--purple);"></span>
+                <span id="btnYandexText">✨ Сгенерировать с YandexGPT 5 PRO</span>
+                <span class="spinner" id="spinnerYandex"></span>
             </button>
         </div>
     </form>
@@ -1308,6 +1357,98 @@ function toggleSection(bodyId, toggleEl) {
     if (!body) return;
     const open = body.classList.toggle('open');
     if (toggleEl) toggleEl.classList.toggle('open', open);
+}
+
+/* ── YandexGPT 5 PRO — генерация синопсиса ──────────────────────────────── */
+async function doYandexGPT() {
+    const btn       = document.getElementById('btnYandex');
+    const spinner   = document.getElementById('spinnerYandex');
+    const btnText   = document.getElementById('btnYandexText');
+    const resultsDiv = document.getElementById('results');
+    const errorBox  = document.getElementById('errorBox');
+
+    // Собираем payload из формы (те же поля, что для /design)
+    const inn      = document.getElementById('inn').value.trim();
+    const dose_mg  = parseFloat(document.getElementById('dose_mg').value);
+    if (!inn || isNaN(dose_mg) || dose_mg <= 0) {
+        errorBox.textContent = 'Пожалуйста, заполните обязательные поля: МНН и дозировка (> 0).';
+        errorBox.style.display = 'flex';
+        resultsDiv.style.display = 'block';
+        ['resPK','resDesign','resSample','resIssues','resSynopsis']
+            .forEach(id => document.getElementById(id).style.display = 'none');
+        return;
+    }
+
+    const payload = {
+        inn,
+        dose_mg,
+        form:       document.getElementById('form').value,
+        regime:     document.getElementById('regime').value,
+        study_type: document.getElementById('study_type').value,
+        min_age:    parseInt(document.getElementById('min_age').value, 10),
+        max_age:    parseInt(document.getElementById('max_age').value, 10),
+        sex:        document.getElementById('sex').value,
+        bmi_min:    parseFloat(document.getElementById('bmi_min').value),
+        bmi_max:    parseFloat(document.getElementById('bmi_max').value),
+    };
+    const cvVal = document.getElementById('cv_intra').value;
+    if (cvVal !== '') payload.cv_intra = parseFloat(cvVal);
+    const cvCat = document.getElementById('cv_category').value;
+    if (cvCat !== '') payload.cv_category = cvCat;
+    const prefDesign = document.getElementById('preferred_design').value.trim();
+    if (prefDesign !== '') payload.preferred_design = prefDesign;
+    if (document.getElementById('need_rsabe').checked) payload.need_rsabe = true;
+
+    // Учётные данные YandexGPT
+    const apiKey   = document.getElementById('yandex_api_key').value.trim();
+    const folderId = document.getElementById('yandex_folder_id').value.trim();
+    if (apiKey)   payload.api_key   = apiKey;
+    if (folderId) payload.folder_id = folderId;
+
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    btnText.textContent = 'Генерация YandexGPT…';
+    errorBox.style.display = 'none';
+
+    try {
+        const resp = await fetch('/design-llm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.detail || `Ошибка сервера: ${resp.status}`);
+        }
+        const data = await resp.json();
+        _lastSynopsisData = data;
+        _lastPayload = payload;
+        renderResults(data);
+        // Показываем статус LLM-генерации
+        if (data.llm_generated) {
+            const synCard = document.getElementById('resSynopsis');
+            const badge = document.createElement('div');
+            badge.className = 'llm-badge-success';
+            badge.textContent = '✨ Синопсис сгенерирован с помощью YandexGPT 5 PRO';
+            synCard.insertBefore(badge, synCard.querySelector('.synopsis-box'));
+        } else if (data.error_message) {
+            const synCard = document.getElementById('resSynopsis');
+            const warn = document.createElement('div');
+            warn.className = 'llm-badge-warning';
+            warn.textContent = '⚠️ YandexGPT недоступен (' + data.error_message + '). Показан шаблонный синопсис.';
+            synCard.insertBefore(warn, synCard.querySelector('.synopsis-box'));
+        }
+    } catch (err) {
+        errorBox.textContent = 'Ошибка: ' + err.message;
+        errorBox.style.display = 'flex';
+        resultsDiv.style.display = 'block';
+        ['resPK','resDesign','resSample','resIssues','resSynopsis']
+            .forEach(id => document.getElementById(id).style.display = 'none');
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = '✨ Сгенерировать с YandexGPT 5 PRO';
+    }
 }
 
 /* ── Export DOCX ─────────────────────────────────────────────────────────── */
