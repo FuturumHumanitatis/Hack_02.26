@@ -604,6 +604,163 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        /* ── Export / action buttons ─────────────────────────────────── */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 18px;
+            border-radius: 9px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid;
+            background: transparent;
+            transition: box-shadow 0.25s, transform 0.2s, background 0.25s;
+            letter-spacing: 0.2px;
+        }
+        .btn-action:hover { transform: translateY(-1px); }
+        .btn-action:active { transform: scale(0.97); }
+        .btn-action:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+        .btn-docx  { color: var(--cyan);   border-color: rgba(0,212,255,0.35); }
+        .btn-docx:hover  { background: rgba(0,212,255,0.08); box-shadow: 0 0 18px rgba(0,212,255,0.18); }
+        .btn-pdf   { color: var(--amber);  border-color: rgba(255,184,0,0.35); }
+        .btn-pdf:hover   { background: rgba(255,184,0,0.08); box-shadow: 0 0 18px rgba(255,184,0,0.18); }
+        .btn-translate { color: var(--purple); border-color: rgba(123,47,255,0.35); }
+        .btn-translate:hover { background: rgba(123,47,255,0.08); box-shadow: 0 0 18px rgba(123,47,255,0.18); }
+        .btn-protocol  { color: var(--green);  border-color: rgba(0,255,136,0.35); }
+        .btn-protocol:hover  { background: rgba(0,255,136,0.08); box-shadow: 0 0 18px rgba(0,255,136,0.18); }
+        /* ── Case library panel ─────────────────────────────────────── */
+        .case-list { display: flex; flex-direction: column; gap: 10px; }
+        .case-card {
+            background: rgba(123,47,255,0.06);
+            border: 1px solid rgba(123,47,255,0.18);
+            border-radius: 10px;
+            padding: 13px 16px;
+            font-size: 0.85rem;
+        }
+        .case-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .case-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: rgba(0,255,136,0.12);
+            color: var(--green);
+            border: 1px solid rgba(0,255,136,0.22);
+        }
+        .case-meta { color: var(--text-secondary); font-size: 0.78rem; margin-top: 4px; }
+        .case-notes { font-style: italic; color: rgba(232,240,254,0.65); font-size: 0.8rem; margin-top: 5px; }
+        .case-ref { font-size: 0.73rem; color: rgba(0,212,255,0.55); margin-top: 4px; }
+        /* ── Sample size visualizer ─────────────────────────────────── */
+        .collapsible-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 0;
+        }
+        .collapsible-toggle .toggle-arrow {
+            font-size: 0.65rem;
+            transition: transform 0.25s;
+            color: var(--text-secondary);
+        }
+        .collapsible-toggle.open .toggle-arrow { transform: rotate(90deg); }
+        .collapsible-body { display: none; margin-top: 14px; }
+        .collapsible-body.open { display: block; }
+        .slider-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .slider-group { flex: 1 1 180px; }
+        .slider-group label {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .slider-group .slider-val {
+            color: var(--cyan);
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(0,212,255,0.18);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px rgba(0,212,255,0.5);
+            cursor: pointer;
+        }
+        #sampleChart { max-height: 300px; }
+        /* ── Compliance panel ───────────────────────────────────────── */
+        .compliance-summary {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .compliance-summary.ok      { background: rgba(0,255,136,0.07); color: var(--green);  border: 1px solid rgba(0,255,136,0.2); }
+        .compliance-summary.warning { background: rgba(255,184,0,0.07); color: var(--amber);  border: 1px solid rgba(255,184,0,0.2); }
+        .compliance-summary.error   { background: rgba(255,34,85,0.07); color: var(--red);    border: 1px solid rgba(255,34,85,0.2); }
+        .compliance-item {
+            padding: 10px 14px;
+            border-radius: 9px;
+            margin-bottom: 7px;
+            border-left: 3px solid;
+            font-size: 0.84rem;
+        }
+        .compliance-item.ok      { border-left-color: var(--green);  background: rgba(0,255,136,0.04); }
+        .compliance-item.warning { border-left-color: var(--amber);  background: rgba(255,184,0,0.04); }
+        .compliance-item.error   { border-left-color: var(--red);    background: rgba(255,34,85,0.05); }
+        .compliance-section-name { font-weight: 700; margin-right: 7px; }
+        .compliance-ref { font-size: 0.73rem; color: rgba(0,212,255,0.55); margin-top: 3px; }
+        /* ── Translated synopsis ────────────────────────────────────── */
+        #translatedContent {
+            background: rgba(123,47,255,0.05);
+            border: 1px solid rgba(123,47,255,0.15);
+            border-radius: 10px;
+            padding: 18px 20px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            line-height: 1.72;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+            color: rgba(232,240,254,0.82);
+            display: none;
+            margin-top: 12px;
+        }
+        #translatedContent::-webkit-scrollbar { width: 4px; }
+        #translatedContent::-webkit-scrollbar-thumb { background: rgba(123,47,255,0.35); border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -819,6 +976,86 @@
                 <h2>Синопсис протокола</h2>
             </div>
             <div class="synopsis-box" id="synopsisContent"></div>
+            <!-- Export & action bar -->
+            <div class="action-bar" id="synopsisActions" style="display:none;">
+                <button class="btn-action btn-docx" id="btnExportDocx" onclick="doExportDocx()">
+                    📄 Скачать DOCX
+                </button>
+                <button class="btn-action btn-pdf" id="btnExportPdf" onclick="doExportPdf()">
+                    📑 Скачать PDF
+                </button>
+                <button class="btn-action btn-translate" id="btnTranslate" onclick="doTranslate()">
+                    🌐 Перевести на английский
+                </button>
+                <button class="btn-action btn-protocol" id="btnProtocol" onclick="doProtocol()">
+                    📋 Полный протокол
+                </button>
+            </div>
+            <!-- Translated synopsis (collapsible) -->
+            <div id="translatedSection" style="display:none; margin-top:14px;">
+                <div class="collapsible-toggle open" onclick="toggleSection('translatedBody',this)" id="translatedToggle">
+                    <span class="toggle-arrow">▶</span>
+                    <span style="font-size:0.85rem;color:var(--text-secondary);font-weight:600;">ENGLISH TRANSLATION</span>
+                    <span id="translateStatus" style="font-size:0.75rem;color:var(--text-secondary);"></span>
+                </div>
+                <div class="collapsible-body open" id="translatedBody">
+                    <div id="translatedContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance -->
+        <div class="card result-section" id="resCompliance" style="display:none;">
+            <div class="card-header">
+                <span class="section-dot dot-green" id="complianceDot"></span>
+                <h2>Соответствие нормативным требованиям</h2>
+            </div>
+            <div id="complianceSummary"></div>
+            <div id="complianceList"></div>
+        </div>
+
+        <!-- Case library -->
+        <div class="card result-section" id="resCases" style="display:none;">
+            <div class="card-header">
+                <span class="section-dot dot-purple"></span>
+                <h2>Похожие исследования (база прецедентов)</h2>
+            </div>
+            <div id="casesList"></div>
+        </div>
+
+        <!-- Sample size visualizer -->
+        <div class="card result-section" id="resSampleViz" style="display:none;">
+            <div class="card-header">
+                <span class="section-dot dot-amber"></span>
+                <h2>
+                    <span class="collapsible-toggle" id="vizToggle" onclick="toggleSection('vizBody', document.getElementById('vizToggle'))">
+                        <span class="toggle-arrow">▶</span>
+                        Визуализация расчёта выборки
+                        <span style="font-size:0.76rem;color:var(--text-secondary);font-weight:400;margin-left:8px;">(скрыть/показать)</span>
+                    </span>
+                </h2>
+            </div>
+            <div class="collapsible-body" id="vizBody">
+                <div class="slider-row">
+                    <div class="slider-group">
+                        <label>CVintra <span class="slider-val" id="sliderCvVal">0.25</span></label>
+                        <input type="range" id="sliderCv" min="0.10" max="0.70" step="0.01" value="0.25" oninput="updateChart()">
+                    </div>
+                    <div class="slider-group">
+                        <label>Мощность <span class="slider-val" id="sliderPowerVal">80%</span></label>
+                        <input type="range" id="sliderPower" min="0.70" max="0.95" step="0.01" value="0.80" oninput="updateChart()">
+                    </div>
+                    <div class="slider-group">
+                        <label>Граница BE (%) <span class="slider-val" id="sliderBeVal">80–125</span></label>
+                        <input type="range" id="sliderBe" min="70" max="90" step="1" value="80" oninput="updateChart()">
+                    </div>
+                </div>
+                <canvas id="sampleChart"></canvas>
+                <p style="font-size:0.78rem;color:var(--text-secondary);margin-top:10px;text-align:center;">
+                    Зависимость размера выборки (N) от CVintra при заданных мощности и границах BE.
+                    Двигайте ползунки для интерактивного обновления графика.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -951,7 +1188,10 @@ document.getElementById('studyForm').addEventListener('submit', async function (
             const err = await resp.json().catch(() => ({}));
             throw new Error(err.detail || `Ошибка сервера: ${resp.status}`);
         }
-        renderResults(await resp.json());
+        const data = await resp.json();
+        _lastSynopsisData = data;
+        _lastPayload = payload;
+        renderResults(data);
     } catch (err) {
         errorBox.textContent = 'Ошибка: ' + err.message;
         errorBox.style.display = 'flex';
@@ -1026,7 +1266,377 @@ function renderResults(data) {
     // Synopsis
     document.getElementById('synopsisContent').textContent = data.synopsis_md;
 
+    // Show action bar
+    document.getElementById('synopsisActions').style.display = 'flex';
+    // Hide translated section until user requests translation
+    document.getElementById('translatedSection').style.display = 'none';
+    document.getElementById('translatedContent').style.display = 'none';
+
+    // Show sample size visualizer
+    const vizCard = document.getElementById('resSampleViz');
+    vizCard.style.display = '';
+    if (!_chartInstance) initChart();
+    // Sync sliders with current CV if available
+    if (data.pk && data.pk.cv_intra) {
+        const cv = Math.min(0.70, Math.max(0.10, data.pk.cv_intra));
+        document.getElementById('sliderCv').value = cv;
+        updateChart();
+    }
+
+    // Load compliance (async, non-blocking)
+    if (_lastPayload) {
+        loadCompliance(_lastPayload);
+        loadCases(_lastPayload);
+    }
+
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
+<!-- Chart.js CDN for sample size visualizer -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+<script>
+/* ── Global state ────────────────────────────────────────────────────────── */
+let _lastSynopsisData = null;   // last /design response
+let _lastPayload      = null;   // last form payload
+let _chartInstance    = null;
+
+/* ── Helpers ──────────────────────────────────────────────────────────────── */
+function toggleSection(bodyId, toggleEl) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    const open = body.classList.toggle('open');
+    if (toggleEl) toggleEl.classList.toggle('open', open);
+}
+
+/* ── Export DOCX ─────────────────────────────────────────────────────────── */
+async function doExportDocx() {
+    if (!_lastSynopsisData) return;
+    const btn = document.getElementById('btnExportDocx');
+    btn.disabled = true;
+    btn.textContent = '⏳ Генерация…';
+    try {
+        const resp = await fetch('/export/docx', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                synopsis_md: _lastSynopsisData.synopsis_md,
+                title: `Синопсис${_lastPayload?.inn ? ': ' + _lastPayload.inn + ' ' + (_lastPayload.dose_mg || '') + 'мг' : ''}`,
+            }),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `synopsis_${_lastPayload?.inn || 'study'}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        alert('Ошибка экспорта DOCX: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📄 Скачать DOCX';
+    }
+}
+
+/* ── Export PDF ──────────────────────────────────────────────────────────── */
+async function doExportPdf() {
+    if (!_lastSynopsisData) return;
+    const btn = document.getElementById('btnExportPdf');
+    btn.disabled = true;
+    btn.textContent = '⏳ Генерация…';
+    try {
+        const resp = await fetch('/export/pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                synopsis_md: _lastSynopsisData.synopsis_md,
+                title: `Синопсис${_lastPayload?.inn ? ': ' + _lastPayload.inn + ' ' + (_lastPayload.dose_mg || '') + 'мг' : ''}`,
+            }),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `synopsis_${_lastPayload?.inn || 'study'}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        alert('Ошибка экспорта PDF: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📑 Скачать PDF';
+    }
+}
+
+/* ── Translate synopsis ──────────────────────────────────────────────────── */
+async function doTranslate() {
+    if (!_lastSynopsisData) return;
+    const btn = document.getElementById('btnTranslate');
+    btn.disabled = true;
+    btn.textContent = '⏳ Перевод…';
+    try {
+        const resp = await fetch('/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                synopsis_md: _lastSynopsisData.synopsis_md,
+                target_language: 'en',
+                regulatory_context: 'EMA',
+            }),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        const box = document.getElementById('translatedContent');
+        box.textContent = data.translated_md;
+        box.style.display = 'block';
+        const section = document.getElementById('translatedSection');
+        section.style.display = 'block';
+        const status = document.getElementById('translateStatus');
+        status.textContent = data.llm_translated ? '✅ LLM' : '⚠️ ' + (data.note || 'шаблон');
+    } catch (err) {
+        alert('Ошибка перевода: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🌐 Перевести на английский';
+    }
+}
+
+/* ── Full protocol ───────────────────────────────────────────────────────── */
+async function doProtocol() {
+    if (!_lastPayload) return;
+    const btn = document.getElementById('btnProtocol');
+    btn.disabled = true;
+    btn.textContent = '⏳ Генерация…';
+    try {
+        const resp = await fetch('/protocol', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ study_input: _lastPayload }),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        // Export as DOCX directly
+        const exportResp = await fetch('/export/docx', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                synopsis_md: data.protocol_md,
+                title: `Протокол${_lastPayload?.inn ? ': ' + _lastPayload.inn + ' ' + (_lastPayload.dose_mg || '') + 'мг' : ''}`,
+            }),
+        });
+        if (!exportResp.ok) throw new Error('Ошибка экспорта протокола');
+        const blob = await exportResp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `protocol_${_lastPayload?.inn || 'study'}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        alert('Ошибка генерации протокола: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📋 Полный протокол';
+    }
+}
+
+/* ── Load compliance ─────────────────────────────────────────────────────── */
+async function loadCompliance(payload) {
+    try {
+        const resp = await fetch('/compliance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ study_input: payload }),
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        renderCompliance(data);
+    } catch (_) { /* non-critical */ }
+}
+
+function renderCompliance(data) {
+    const card = document.getElementById('resCompliance');
+    const dot  = document.getElementById('complianceDot');
+    const sumEl = document.getElementById('complianceSummary');
+    const listEl = document.getElementById('complianceList');
+
+    card.style.display = '';
+
+    const dotClass = data.overall_status === 'ok' ? 'dot-green'
+        : data.overall_status === 'error' ? 'dot-red' : 'dot-amber';
+    dot.className = 'section-dot ' + dotClass;
+
+    sumEl.innerHTML = `<div class="compliance-summary ${data.overall_status}">${data.summary}</div>`;
+
+    listEl.innerHTML = data.sections.map(s => `
+        <div class="compliance-item ${s.status}">
+            <span class="compliance-section-name">${s.section}</span>${s.message}
+            ${s.reference ? `<div class="compliance-ref">📎 ${s.reference}</div>` : ''}
+        </div>
+    `).join('');
+}
+
+/* ── Load similar cases ──────────────────────────────────────────────────── */
+async function loadCases(payload) {
+    try {
+        const resp = await fetch('/cases/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                inn: payload.inn,
+                cv_intra: payload.cv_intra || null,
+                design: payload.preferred_design || null,
+                limit: 3,
+            }),
+        });
+        if (!resp.ok) return;
+        const cases = await resp.json();
+        renderCases(cases);
+    } catch (_) { /* non-critical */ }
+}
+
+function renderCases(cases) {
+    const card = document.getElementById('resCases');
+    const listEl = document.getElementById('casesList');
+    if (!cases || cases.length === 0) {
+        listEl.innerHTML = '<p style="color:var(--text-secondary);font-size:0.85rem;">Похожих прецедентов не найдено в базе.</p>';
+    } else {
+        listEl.innerHTML = '<div class="case-list">' + cases.map(c => `
+            <div class="case-card">
+                <div class="case-card-header">
+                    <strong style="color:var(--text)">${c.inn} ${c.dose_mg}мг</strong>
+                    <span class="case-badge">${c.result || 'Завершено'}</span>
+                    <span style="color:var(--text-secondary);font-size:0.75rem;">${c.year || ''}</span>
+                </div>
+                <div class="case-meta">
+                    Дизайн: <strong style="color:var(--cyan)">${c.design}</strong> &nbsp;·&nbsp;
+                    N: <strong style="color:var(--cyan)">${c.n_total}</strong> &nbsp;·&nbsp;
+                    CV: <strong style="color:var(--cyan)">${c.cv_intra ? (c.cv_intra * 100).toFixed(0) + '%' : '—'}</strong> &nbsp;·&nbsp;
+                    Wash-out: <strong style="color:var(--cyan)">${c.washout_days} дн.</strong>
+                </div>
+                ${c.notes ? `<div class="case-notes">${c.notes}</div>` : ''}
+                ${c.regulatory ? `<div class="case-ref">📎 ${c.regulatory}</div>` : ''}
+            </div>
+        `).join('') + '</div>';
+    }
+    card.style.display = '';
+}
+
+/* ── Sample size chart ───────────────────────────────────────────────────── */
+function calcN(cv, power, beLower) {
+    // Normal approximation TOST (log-scale)
+    // Uses rational approximation for the normal quantile (Beasley-Springer-Moro)
+    function qnorm(p) {
+        const a = [2.515517, 0.802853, 0.010328];
+        const b = [1.432788, 0.189269, 0.001308];
+        const t = Math.sqrt(-2 * Math.log(p < 0.5 ? p : 1 - p));
+        const num = a[0] + a[1]*t + a[2]*t*t;
+        const den = 1 + b[0]*t + b[1]*t*t + b[2]*t*t*t;
+        const val = t - num / den;
+        return p < 0.5 ? -val : val;
+    }
+    const alpha = 0.05;
+    const delta = Math.abs(Math.log(beLower / 100));  // log(0.80) ≈ 0.2231
+    const za = qnorm(1 - alpha);    // one-sided z_alpha
+    const zb = qnorm(power);        // z_beta
+    const sigma = Math.sqrt(2) * cv;
+    const n = Math.ceil(2 * Math.pow((za + zb) * sigma / delta, 2));
+    return Math.max(4, Math.min(n, 300));
+}
+
+function buildChartData() {
+    const power = parseFloat(document.getElementById('sliderPower').value);
+    const beLower = parseFloat(document.getElementById('sliderBe').value);
+    const cvFixed = parseFloat(document.getElementById('sliderCv').value);
+
+    const labels = [];
+    const dataFixed = [];
+    for (let cv = 0.10; cv <= 0.70; cv += 0.025) {
+        labels.push((cv * 100).toFixed(1) + '%');
+        dataFixed.push(calcN(cv, power, beLower));
+    }
+
+    // Highlight current CV
+    const highlightIdx = Math.round((cvFixed - 0.10) / 0.025);
+    return { labels, dataFixed, highlightIdx, cvFixed };
+}
+
+function initChart() {
+    const ctx = document.getElementById('sampleChart').getContext('2d');
+    const { labels, dataFixed, highlightIdx } = buildChartData();
+
+    const pointColors = dataFixed.map((_, i) =>
+        i === highlightIdx ? '#ffb800' : 'rgba(0,212,255,0.7)'
+    );
+    const pointSizes = dataFixed.map((_, i) => i === highlightIdx ? 7 : 3);
+
+    _chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'N (размер выборки)',
+                data: dataFixed,
+                borderColor: 'rgba(0,212,255,0.8)',
+                backgroundColor: 'rgba(0,212,255,0.07)',
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: pointColors,
+                pointRadius: pointSizes,
+                pointHoverRadius: 7,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#7a8fb5', font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` N = ${ctx.parsed.y} добровольцев`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'CVintra', color: '#7a8fb5' },
+                    ticks: { color: '#7a8fb5', maxTicksLimit: 12 },
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                },
+                y: {
+                    title: { display: true, text: 'Размер выборки N', color: '#7a8fb5' },
+                    ticks: { color: '#7a8fb5' },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
+                    min: 0,
+                },
+            },
+        },
+    });
+}
+
+function updateChart() {
+    const cv    = parseFloat(document.getElementById('sliderCv').value);
+    const power = parseFloat(document.getElementById('sliderPower').value);
+    const be    = parseFloat(document.getElementById('sliderBe').value);
+
+    document.getElementById('sliderCvVal').textContent    = cv.toFixed(2);
+    document.getElementById('sliderPowerVal').textContent = (power * 100).toFixed(0) + '%';
+    document.getElementById('sliderBeVal').textContent    = `${be}–${200 - be}`;
+
+    if (!_chartInstance) return;
+    const { labels, dataFixed, highlightIdx } = buildChartData();
+    _chartInstance.data.labels = labels;
+    _chartInstance.data.datasets[0].data = dataFixed;
+    _chartInstance.data.datasets[0].pointBackgroundColor = dataFixed.map((_, i) =>
+        i === highlightIdx ? '#ffb800' : 'rgba(0,212,255,0.7)'
+    );
+    _chartInstance.data.datasets[0].pointRadius = dataFixed.map((_, i) =>
+        i === highlightIdx ? 7 : 3
+    );
+    _chartInstance.update();
 }
 </script>
 
