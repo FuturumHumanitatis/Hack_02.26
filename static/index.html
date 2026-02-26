@@ -82,16 +82,6 @@
             pointer-events: none;
             z-index: 1;
         }
-        /* Moving scan line */
-        .scan-line {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(0,212,255,0.5), transparent);
-            pointer-events: none;
-            z-index: 9998;
-            opacity: 0.35;
-        }
         /* Header */
         header {
             position: relative;
@@ -313,6 +303,10 @@
             background-repeat: no-repeat;
             background-position: right 13px center;
             padding-right: 34px;
+        }
+        select option {
+            background-color: #060d1a;
+            color: #e8f0fe;
         }
         input[type="number"] { -moz-appearance: textfield; }
         input::-webkit-outer-spin-button,
@@ -565,10 +559,6 @@
             from { opacity: 0; transform: translateY(14px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes scanMove {
-            0%   { transform: translateY(-100vh); }
-            100% { transform: translateY(200vh); }
-        }
         @keyframes shimmer {
             0%, 20% { left: -40%; }
             65%, 100% { left: 135%; }
@@ -607,7 +597,6 @@
             .ambient-blob-1 { animation: blobDrift1 20s ease-in-out infinite; }
             .ambient-blob-2 { animation: blobDrift2 24s ease-in-out infinite; }
             .ambient-blob-3 { animation: blobDrift3 28s ease-in-out infinite; }
-            .scan-line { animation: scanMove 6s linear infinite; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -619,7 +608,6 @@
 </head>
 <body>
 
-<div class="scan-line"></div>
 <div class="ambient-blob ambient-blob-1"></div>
 <div class="ambient-blob ambient-blob-2"></div>
 <div class="ambient-blob ambient-blob-3"></div>
