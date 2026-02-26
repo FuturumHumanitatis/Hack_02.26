@@ -38,5 +38,5 @@ DESIGN_ADJUSTMENT = {
 
 # LLM настройки
 LLM_ENABLED = True  # Включить/выключить использование LLM для генерации синопсиса
-LLM_MODEL = "gpt-4"  # Модель OpenAI для использования
+LLM_MODEL = "yandexgpt-5-pro"  # Модель YandexGPT для использования
 LLM_FALLBACK_TO_TEMPLATE = True  # Использовать шаблонную генерацию при ошибке LLM

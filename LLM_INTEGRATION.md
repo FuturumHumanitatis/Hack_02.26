@@ -1,13 +1,40 @@
-# LLM Integration Guide
+# LLM Integration Guide — YandexGPT 5 PRO
 
-Этот документ описывает интеграцию LLM (Large Language Model) для генерации синопсисов протоколов исследований биоэквивалентности.
+Этот документ описывает интеграцию **YandexGPT 5 PRO** для генерации синопсисов протоколов исследований биоэквивалентности.
 
 ## Обзор
 
 Проект поддерживает два режима генерации синопсиса:
 
-1. **Шаблонная генерация** — быстрая генерация на основе предопределённых шаблонов
-2. **LLM-генерация** — использование GPT-4 для создания более детальных и профессиональных текстов
+1. **Шаблонная генерация** — мгновенная генерация на основе предопределённых шаблонов (кнопка «Рассчитать план исследования»)
+2. **LLM-генерация** — использование YandexGPT 5 PRO для создания детальных профессиональных синопсисов (кнопка «✨ Сгенерировать с YandexGPT 5 PRO»)
+
+### Схема работы
+
+```
+Пользователь вводит данные исследования
+        ↓
+Система собирает PK-параметры, дизайн, размер выборки
+        ↓
+Данные форматируются в JSON и передаются вместе со
+специальными инструкциями по заполнению синопсиса
+        ↓
+YandexGPT 5 PRO генерирует профессиональный синопсис
+        ↓
+Синопсис отображается пользователю
+```
+
+### Специальный промпт
+
+Для генерации синопсиса используется специально разработанный промпт (`SYNOPSIS_FILLING_INSTRUCTIONS` в `llm/client.py`), который инструктирует модель:
+
+- Заполнять все разделы синопсиса данными из JSON
+- Соблюдать медицинскую и регуляторную терминологию (Минздрав РФ, EMA, FDA)
+- Не добавлять информацию, отсутствующую во входных данных (запрет галлюцинаций)
+- Сохранять структуру документа со всеми разделами и таблицами
+- Использовать правильные числовые форматы (проценты, дни, объёмы)
+
+---
 
 ## Настройка
 
@@ -17,50 +44,112 @@
 pip install -r requirements.txt
 ```
 
-Это установит библиотеку `openai>=1.0.0` и другие необходимые пакеты.
+Это установит библиотеку `requests>=2.28` и другие необходимые пакеты.
 
-### 2. Получение API ключа OpenAI
+### 2. Получение учётных данных Yandex Cloud
 
-1. Зарегистрируйтесь на https://platform.openai.com/
-2. Перейдите в раздел API Keys: https://platform.openai.com/api-keys
-3. Создайте новый API ключ
-4. Скопируйте ключ (он будет показан только один раз)
+Для работы с YandexGPT 5 PRO необходимы два параметра:
 
-### 3. Установка API ключа
+#### 2.1. API-ключ Yandex Cloud
 
-Установите переменную окружения `OPENAI_API_KEY`:
+1. Войдите в консоль Yandex Cloud: https://console.yandex.cloud/
+2. Выберите нужный сервисный аккаунт или создайте новый
+3. Перейдите в раздел **IAM → Сервисные аккаунты → {ваш аккаунт} → API-ключи**
+4. Нажмите «Создать API-ключ»
+5. Скопируйте секретный ключ (показывается только один раз)
+6. Документация: https://yandex.cloud/ru/docs/iam/operations/api-key/create
+
+#### 2.2. Идентификатор каталога (Folder ID)
+
+1. В консоли Yandex Cloud откройте нужный каталог
+2. Folder ID отображается в адресной строке или на странице каталога
+3. Документация: https://yandex.cloud/ru/docs/resource-manager/operations/folder/get-id
+
+### 3. Ввод ключей через UI
+
+В интерфейсе приложения:
+
+1. Заполните форму с параметрами исследования (МНН, дозировка и т.д.)
+2. В разделе **«YandexGPT 5 PRO — генерация синопсиса»** введите:
+   - **API-ключ Yandex Cloud** (поле `API-ключ Yandex Cloud`)
+   - **Идентификатор каталога** (поле `Folder ID`)
+3. Нажмите кнопку **«✨ Сгенерировать с YandexGPT 5 PRO»**
+
+> 🔒 Ключи используются только в рамках одного запроса и не сохраняются.
+
+### 4. Настройка через переменные окружения
+
+Для серверного развёртывания без UI-ввода:
 
 ```bash
-export OPENAI_API_KEY='sk-...'
+export YANDEX_API_KEY='AQVN...'
+export YANDEX_FOLDER_ID='b1g...'
 ```
 
-Для постоянного использования, добавьте эту строку в `~/.bashrc` или `~/.zshrc`:
+Для постоянного использования, добавьте в `~/.bashrc`:
 
 ```bash
-echo 'export OPENAI_API_KEY="sk-..."' >> ~/.bashrc
+echo 'export YANDEX_API_KEY="AQVN..."' >> ~/.bashrc
+echo 'export YANDEX_FOLDER_ID="b1g..."' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 4. Конфигурация
-
-В файле `config.py` доступны следующие настройки:
+### 5. Конфигурация (`config.py`)
 
 ```python
-# Включить/выключить использование LLM для генерации синопсиса
-LLM_ENABLED = True
-
-# Модель OpenAI для использования
-LLM_MODEL = "gpt-4"
-
-# Использовать шаблонную генерацию при ошибке LLM
-LLM_FALLBACK_TO_TEMPLATE = True
+LLM_ENABLED = True                  # Включить LLM-генерацию
+LLM_MODEL = "yandexgpt-5-pro"       # Модель YandexGPT
+LLM_FALLBACK_TO_TEMPLATE = True     # Fallback на шаблоны при ошибке LLM
 ```
+
+---
 
 ## Использование
 
-### 1. Через API
+### 1. Через UI (рекомендуется)
 
-#### Шаблонная генерация (старый метод)
+1. Откройте приложение в браузере
+2. Заполните параметры исследования
+3. Введите API-ключ и Folder ID в разделе YandexGPT
+4. Нажмите **«✨ Сгенерировать с YandexGPT 5 PRO»**
+5. После генерации доступны кнопки экспорта (DOCX, PDF, перевод на английский)
+
+### 2. Через API
+
+#### Эндпоинт `/design-llm`
+
+```bash
+curl -X POST http://localhost:8000/design-llm \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inn": "омепразол",
+    "dose_mg": 20,
+    "form": "capsule",
+    "cv_category": "low",
+    "regime": "fasted",
+    "api_key": "AQVN...",
+    "folder_id": "b1g..."
+  }'
+```
+
+Ответ содержит дополнительные поля:
+
+```json
+{
+  "pk": { ... },
+  "design": { ... },
+  "sample_size": { ... },
+  "issues": [ ... ],
+  "synopsis_md": "# Синопсис протокола...",
+  "llm_generated": true,
+  "error_message": null
+}
+```
+
+- `llm_generated`: `true` — синопсис создан YandexGPT; `false` — использован шаблон
+- `error_message`: описание ошибки (null при успешной генерации)
+
+#### Шаблонная генерация (без LLM)
 
 ```bash
 curl -X POST http://localhost:8000/design \
@@ -74,38 +163,7 @@ curl -X POST http://localhost:8000/design \
   }'
 ```
 
-#### LLM-генерация (новый метод)
-
-```bash
-curl -X POST http://localhost:8000/design-llm \
-  -H "Content-Type: application/json" \
-  -d '{
-    "inn": "омепразол",
-    "dose_mg": 20,
-    "form": "capsule",
-    "cv_category": "low",
-    "regime": "fasted"
-  }'
-```
-
-Ответ будет содержать дополнительные поля:
-
-```json
-{
-  "pk": { ... },
-  "design": { ... },
-  "sample_size": { ... },
-  "issues": [ ... ],
-  "synopsis_md": "# Синопсис...",
-  "llm_generated": true,
-  "error_message": null
-}
-```
-
-- `llm_generated`: `true` если синопсис был сгенерирован через LLM, `false` если использовался fallback
-- `error_message`: описание ошибки, если LLM недоступен (null при успешной генерации)
-
-### 2. Через Python API
+### 3. Через Python API
 
 ```python
 from models.domain import StudyInput
@@ -115,7 +173,6 @@ from stats.sample_size import calculate_sample_size
 from reg.checks import run_regulatory_checks
 from llm.client import generate_llm_synopsis
 
-# Создаём входные данные
 study = StudyInput(
     inn="омепразол",
     dose_mg=20.0,
@@ -124,192 +181,119 @@ study = StudyInput(
     regime="fasted",
 )
 
-# Получаем все необходимые данные
 pk = get_pk_parameters(study)
 design = select_study_design(study, pk)
 sample = calculate_sample_size(study, design)
 issues = run_regulatory_checks(study, pk, design, sample)
 
-# Генерируем синопсис через LLM
 synopsis = generate_llm_synopsis(
     study, pk, design, sample, issues,
-    api_key=None,  # Использует OPENAI_API_KEY из окружения
-    model="gpt-4"
+    api_key="AQVN...",    # или None — тогда берётся из YANDEX_API_KEY
+    folder_id="b1g...",   # или None — тогда берётся из YANDEX_FOLDER_ID
+    model="yandexgpt-5-pro",
 )
 
 print(synopsis)
 ```
 
-### 3. Через демо-скрипт
+---
 
-```bash
-# Убедитесь, что OPENAI_API_KEY установлен
-export OPENAI_API_KEY='sk-...'
+## Техническая реализация
 
-# Запустите демо
-python demo/llm_demo.py
+### API-эндпоинт YandexGPT
+
+- **URL**: `https://llm.api.cloud.yandex.net/foundationModels/v1/completion`
+- **Метод**: `POST`
+- **Аутентификация**: `Authorization: Api-Key {api_key}`
+- **Модель**: `gpt://{folder_id}/yandexgpt-5-pro/latest`
+
+### Параметры запроса
+
+```json
+{
+  "modelUri": "gpt://{folder_id}/yandexgpt-5-pro/latest",
+  "completionOptions": {
+    "stream": false,
+    "temperature": 0.3,
+    "maxTokens": "8000"
+  },
+  "messages": [
+    {"role": "system", "text": "...системный промпт..."},
+    {"role": "user",   "text": "...инструкции + JSON данных..."}
+  ]
+}
 ```
 
-Скрипт:
-- Проверит наличие API ключа
-- Соберёт все необходимые данные об исследовании
-- Отправит запрос к OpenAI API
-- Сохранит результат в `llm_synopsis_omeprazole.md`
+### Входные данные для LLM (JSON-формат)
 
-## Промпт для генерации
+Система автоматически формирует следующую JSON-структуру из параметров исследования:
 
-LLM использует специально разработанный промпт (см. `llm/client.py`), который инструктирует модель:
-
-- Создавать медицинский текст в соответствии с требованиями регуляторов (Минздрав РФ, EMA, FDA)
-- Включать все необходимые разделы протокола
-- Использовать профессиональные медицинские формулировки
-- Структурировать документ в формате Markdown
-
-Промпт получает на вход:
-- Параметры препарата (МНН, дозировка, форма)
-- Фармакокинетические параметры
-- Дизайн исследования
-- Размер выборки
-- Регуляторные замечания
-
-## Обработка ошибок
-
-### 1. Отсутствует API ключ
-
-**Ошибка**: `OPENAI_API_KEY не установлен`
-
-**Решение**:
-```bash
-export OPENAI_API_KEY='sk-...'
+```json
+{
+  "protocol_name": "Протокол исследования биоэквивалентности омепразол 20 мг",
+  "test_drug": { "name": "омепразол 20 мг (капсулу)", "substance": "омепразол" },
+  "reference_drug": { "name": "омепразол (референтный препарат)" },
+  "design": { "type": "2×2 crossover", "food": "натощак", "washout_days": 7 },
+  "pk_data": { "cv_intra_percent": 25, "t_half_hours": 1.0, "tmax_value": 1.0 },
+  "sample_size": { "n_enrolled": 24, "dropout_percent": 20, ... },
+  "study_periods": { "screening_max_days": 14, "pk_period_days": 1, ... },
+  "bioequivalence_criteria": { "ci_level": 90, "lower_bound": 80.0, "upper_bound": 125.0 },
+  ...
+}
 ```
 
-### 2. Недостаточный баланс на аккаунте
+---
 
-**Ошибка**: `Insufficient quota` или подобное
+## Обработка ошибок и Fallback
 
-**Решение**:
-- Пополните баланс на https://platform.openai.com/account/billing
-- Проверьте лимиты использования API
+| Ситуация | Поведение |
+|----------|-----------|
+| API-ключ/Folder ID не указаны | Fallback → шаблонная генерация + предупреждение |
+| Ошибка сети | Fallback → шаблонная генерация + сообщение об ошибке |
+| Ошибка HTTP API YandexGPT | Fallback → шаблонная генерация + сообщение об ошибке |
+| `LLM_FALLBACK_TO_TEMPLATE = False` | HTTP 500 при любой ошибке LLM |
 
-### 3. Проблемы с сетью
+### Отключение Fallback
 
-**Ошибка**: `Connection error` или timeout
-
-**Решение**:
-- Проверьте подключение к интернету
-- Убедитесь, что OpenAI API доступен из вашей сети
-- При необходимости настройте прокси
-
-### 4. Fallback к шаблонной генерации
-
-Если `LLM_FALLBACK_TO_TEMPLATE = True` (по умолчанию), при любой ошибке LLM система автоматически переключится на шаблонную генерацию.
-
-Чтобы отключить fallback и получать ошибки:
+Чтобы получать явные ошибки вместо шаблонного синопсиса:
 
 ```python
 # config.py
 LLM_FALLBACK_TO_TEMPLATE = False
 ```
 
+---
+
 ## Сравнение методов генерации
 
-| Характеристика | Шаблонная генерация | LLM-генерация |
-|----------------|---------------------|---------------|
-| Скорость | Мгновенная (~1 мс) | ~5-15 секунд |
-| Стоимость | Бесплатно | ~$0.03-0.12 за запрос |
+| Характеристика | Шаблонная генерация | YandexGPT 5 PRO |
+|----------------|---------------------|-----------------|
+| Скорость | Мгновенная (~1 мс) | ~10–30 секунд |
+| Требования | Нет | API-ключ + Folder ID |
 | Качество текста | Базовое, шаблонное | Высокое, профессиональное |
-| Детализация | Стандартная | Улучшенная |
-| Требования | Нет | API ключ OpenAI |
+| Медицинская точность | Стандартная | Улучшенная |
 | Надёжность | 100% | Зависит от доступности API |
+| Стоимость | Бесплатно | По тарифам Yandex Cloud |
 
-## Стоимость использования
-
-При использовании GPT-4:
-- Input: ~$0.03 за 1K токенов
-- Output: ~$0.06 за 1K токенов
-- Типичный запрос: ~500 input tokens + ~2000 output tokens
-- **Стоимость одного синопсиса**: ~$0.14 (0.5 * $0.03 + 2.0 * $0.06)
-
-Для снижения стоимости можно использовать GPT-3.5-turbo:
-
-```python
-synopsis = generate_llm_synopsis(
-    ...,
-    model="gpt-3.5-turbo"  # Дешевле в ~10 раз
-)
-```
-
-## Улучшение синопсиса
-
-Помимо полной генерации, доступна функция улучшения существующего синопсиса:
-
-```python
-from synopsis.generator import generate_synopsis_markdown
-from llm.client import enhance_synopsis_with_llm
-
-# Создаём базовый синопсис шаблонами
-base_synopsis = generate_synopsis_markdown(study, pk, design, sample, issues)
-
-# Улучшаем его через LLM
-enhanced_synopsis = enhance_synopsis_with_llm(
-    base_synopsis,
-    api_key=None,
-    model="gpt-4"
-)
-```
-
-Это полезно когда:
-- Нужно сохранить все технические данные из шаблона
-- Требуется улучшить только стиль и формулировки
-- Хочется сэкономить на токенах (меньше input данных)
-
-## Разработка и тестирование
-
-### Тестирование без API ключа
-
-Для тестирования без реальных вызовов к OpenAI:
-
-```python
-# Установите fallback режим
-LLM_FALLBACK_TO_TEMPLATE = True
-
-# Или явно обработайте отсутствие ключа
-try:
-    synopsis = generate_llm_synopsis(...)
-except ValueError as e:
-    print(f"LLM недоступен: {e}")
-    # Используйте шаблонную генерацию
-    synopsis = generate_synopsis_markdown(...)
-```
-
-### Логирование
-
-Для отладки можно добавить логирование запросов:
-
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-# Теперь OpenAI библиотека будет выводить детальные логи
-```
+---
 
 ## Безопасность
 
-### Не коммитьте API ключи!
-
-❌ **Никогда не коммитьте API ключи в репозиторий:**
+### ❌ Никогда не коммитьте ключи в репозиторий
 
 ```python
 # НЕ ДЕЛАЙТЕ ТАК!
-api_key = "sk-..."
+api_key = "AQVN..."
 ```
 
-✅ **Используйте переменные окружения:**
+### ✅ Используйте переменные окружения или UI-ввод
 
 ```python
 import os
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("YANDEX_API_KEY")
 ```
+
+Ключи, введённые через UI, передаются только в рамках одного HTTPS-запроса и не сохраняются на сервере.
 
 ### .gitignore
 
@@ -321,23 +305,36 @@ api_key = os.getenv("OPENAI_API_KEY")
 *.key
 ```
 
+---
+
+## Тестирование без реального API-ключа
+
+При `LLM_FALLBACK_TO_TEMPLATE = True` (по умолчанию) система автоматически переключается на шаблонную генерацию:
+
+```python
+from llm.client import generate_llm_synopsis
+
+try:
+    synopsis = generate_llm_synopsis(
+        study, pk, design, sample, issues,
+        api_key=None,    # не задан → ValueError → fallback
+        folder_id=None,
+    )
+except ValueError as e:
+    print(f"LLM недоступен: {e}")
+    from synopsis.generator import generate_synopsis_markdown
+    synopsis = generate_synopsis_markdown(study, pk, design, sample, issues)
+```
+
+---
+
 ## Поддержка и вопросы
 
 При возникновении проблем:
 
-1. Проверьте, что API ключ установлен: `echo $OPENAI_API_KEY`
-2. Проверьте баланс аккаунта OpenAI
-3. Проверьте логи ошибок в выводе программы
-4. Попробуйте режим fallback для отладки
-5. Обратитесь к документации OpenAI: https://platform.openai.com/docs
+1. Проверьте корректность API-ключа и Folder ID в консоли Yandex Cloud
+2. Убедитесь, что у сервисного аккаунта есть роль `ai.languageModels.user`
+3. Проверьте логи ошибок в выводе сервера
+4. Используйте шаблонную генерацию для отладки
+5. Документация YandexGPT: https://yandex.cloud/ru/docs/foundation-models/concepts/yandexgpt/
 
-## Roadmap
-
-Планируемые улучшения:
-
-- [ ] Поддержка других LLM провайдеров (Anthropic Claude, local models)
-- [ ] Кэширование результатов для экономии
-- [ ] Батч-обработка нескольких синопсисов
-- [ ] Настройка промптов через конфигурацию
-- [ ] Поддержка разных языков вывода
-- [ ] Асинхронные запросы к API
